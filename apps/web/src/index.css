@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-primary: #2563eb;
+  --brand-secondary: #1e40af;
+}
+
+body {
+  @apply bg-gray-50 text-gray-900;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tablet-first touch targets */
+@layer components {
+  .btn {
+    @apply min-h-[44px] min-w-[44px] px-4 py-2 rounded-lg font-medium
+           transition-colors duration-150 ease-in-out
+           focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .btn-success {
+    @apply btn bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+  }
+
+  .input {
+    @apply min-h-[44px] w-full px-3 py-2 border border-gray-300 rounded-lg
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-4;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-intake {
+    @apply badge bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-reset {
+    @apply badge bg-orange-100 text-orange-800;
+  }
+
+  .badge-functional {
+    @apply badge bg-blue-100 text-blue-800;
+  }
+
+  .badge-qc {
+    @apply badge bg-purple-100 text-purple-800;
+  }
+
+  .badge-completed {
+    @apply badge bg-green-100 text-green-800;
+  }
+
+  .badge-failed {
+    @apply badge bg-red-100 text-red-800;
+  }
+
+  .badge-on_hold {
+    @apply badge bg-gray-100 text-gray-800;
+  }
+}
+
+/* Workflow status colors */
+.status-intake { @apply text-yellow-600; }
+.status-reset { @apply text-orange-600; }
+.status-functional { @apply text-blue-600; }
+.status-qc { @apply text-purple-600; }
+.status-completed { @apply text-green-600; }
+.status-failed { @apply text-red-600; }
+.status-on_hold { @apply text-gray-600; }
