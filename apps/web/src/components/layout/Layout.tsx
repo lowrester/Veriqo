@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/authStore'
 import {
   LayoutDashboard,
   Clipboard,
-  Users,
+  Settings,
   LogOut,
   Menu,
   X,
@@ -13,7 +13,7 @@ import { useState } from 'react'
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Jobb', href: '/jobs', icon: Clipboard },
-  { name: 'Användare', href: '/users', icon: Users, adminOnly: true },
+  { name: 'Administration', href: '/admin', icon: Settings, adminOnly: true },
 ]
 
 export function Layout() {
@@ -70,8 +70,8 @@ export function Layout() {
                     to={item.href}
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-gray-700 hover:bg-gray-100'
                       }`}
                   >
                     <item.icon className="w-5 h-5" />
