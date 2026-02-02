@@ -32,6 +32,15 @@ export interface UpdateUserData {
   is_active?: boolean
 }
 
+export interface Report {
+  id: string
+  scope: string
+  variant: string
+  generated_at: string
+  expires_at: string
+  public_url: string
+}
+
 export const STATUS_LABELS: Record<JobStatus, string> = {
   intake: 'Intake',
   reset: 'Reset',

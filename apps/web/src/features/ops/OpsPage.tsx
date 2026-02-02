@@ -55,7 +55,7 @@ export function OpsPage() {
                     Throughput by Station
                 </h2>
                 <div className="space-y-3">
-                    {['intake', 'reset', 'test', 'qc'].map((station) => (
+                    {['intake', 'reset', 'functional', 'qc'].map((station) => (
                         <div key={station} className="flex items-center justify-between">
                             <span className="text-sm font-medium text-gray-700 capitalize">
                                 {station}

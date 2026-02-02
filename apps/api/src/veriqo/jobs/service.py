@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -40,6 +40,7 @@ class JobRepository:
         self,
         status: Optional[JobStatus] = None,
         technician_id: Optional[str] = None,
+        search: Optional[str] = None,
         limit: int = 50,
         offset: int = 0,
     ) -> list[Job]:
@@ -58,6 +59,16 @@ class JobRepository:
 
         if technician_id:
             stmt = stmt.where(Job.assigned_technician_id == technician_id)
+
+        if search:
+            search_term = f"%{search}%"
+            stmt = stmt.where(
+                or_(
+                    Job.serial_number.ilike(search_term),
+                    Job.batch_id.ilike(search_term),
+                    Job.customer_reference.ilike(search_term),
+                )
+            )
 
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
@@ -210,6 +221,7 @@ class JobService:
         self,
         status: Optional[str] = None,
         technician_id: Optional[str] = None,
+        search: Optional[str] = None,
         limit: int = 50,
         offset: int = 0,
     ) -> list[Job]:
@@ -218,6 +230,7 @@ class JobService:
         return await self.repo.list(
             status=status_enum,
             technician_id=technician_id,
+            search=search,
             limit=limit,
             offset=offset,
         )

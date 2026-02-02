@@ -47,6 +47,26 @@ async def get_device(
         raise HTTPException(status_code=404, detail="Device not found")
     return device
 
+@router.put("/{device_id}", response_model=DeviceResponse)
+async def update_device(
+    device_id: str,
+    device_in: DeviceUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    """Update a device type."""
+    device = await db.get(Device, device_id)
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    update_data = device_in.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(device, field, value)
+        
+    await db.commit()
+    await db.refresh(device)
+    return device
+
 @router.delete("/{device_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_device(
     device_id: str,

@@ -3,7 +3,7 @@
  */
 
 export type UserRole = 'admin' | 'supervisor' | 'technician' | 'viewer'
-export type StationType = 'intake' | 'reset' | 'test' | 'qc'
+export type StationType = 'intake' | 'reset' | 'functional' | 'qc'
 
 export interface NavItem {
     label: string

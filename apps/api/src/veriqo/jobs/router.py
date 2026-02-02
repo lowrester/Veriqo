@@ -78,6 +78,7 @@ async def list_jobs(
     current_user: Annotated[User, Depends(get_current_user)],
     status: Optional[str] = Query(None),
     technician_id: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
@@ -86,6 +87,7 @@ async def list_jobs(
     jobs = await service.list(
         status=status,
         technician_id=technician_id,
+        search=search,
         limit=limit,
         offset=offset,
     )
@@ -289,7 +291,11 @@ async def get_job_steps(
     steps = (await db.execute(stmt)).scalars().all()
     
     # Get Results
-    stmt_results = select(TestResult).where(TestResult.job_id == job_id)
+    stmt_results = (
+        select(TestResult)
+        .options(selectinload(TestResult.evidence_items))
+        .where(TestResult.job_id == job_id)
+    )
     results = (await db.execute(stmt_results)).scalars().all()
     results_map = {r.test_step_id: r for r in results}
     
@@ -298,17 +304,16 @@ async def get_job_steps(
     for step in steps:
         result = results_map.get(step.id)
         
-        # Get evidence if result exists
         evidence_list = []
         if result:
-            # Load evidence (need to ensure relationship loading or explicit query)
-            # Assuming eager load or separate query. Let's do separate for safety
-            # stmt_ev = select(Evidence).where(Evidence.test_result_id == result.id)
-            # ev_items = (await db.execute(stmt_ev)).scalars().all()
-            # For this context, standard lazy loading might fail in async without selectinload.
-            # We'll skip complex evidence loading for this "quick fix" unless critical.
-            # User wants "Validation", so "Evidence" list is part of it.
-            pass
+            evidence_list = [
+                EvidenceSummary(
+                    id=ev.id,
+                    original_filename=ev.original_filename,
+                    evidence_type=ev.evidence_type.value,
+                    created_at=ev.created_at
+                ) for ev in result.evidence_items
+            ]
 
         response.append(TestStepResponse(
             id=step.id,
@@ -319,7 +324,7 @@ async def get_job_steps(
             requires_evidence=step.requires_evidence,
             status=result.status.value if result else "pending",
             notes=result.notes if result else None,
-            evidence=[] # populated if we fetched it
+            evidence=evidence_list
         ))
         
     return response

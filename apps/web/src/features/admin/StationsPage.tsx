@@ -7,7 +7,7 @@ import { formatDate } from '@/types'
 interface Station {
     id: string
     name: string
-    station_type: 'intake' | 'reset' | 'test' | 'qc'
+    station_type: 'intake' | 'reset' | 'functional' | 'qc'
     is_active: boolean
     last_active_at: string
 }
@@ -17,7 +17,7 @@ export function StationsPage() {
     const [isCreating, setIsCreating] = useState(false)
     const [formData, setFormData] = useState({
         name: '',
-        station_type: 'test',
+        station_type: 'functional',
     })
 
     // Fetch stations
@@ -32,7 +32,7 @@ export function StationsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['stations'] })
             setIsCreating(false)
-            setFormData({ name: '', station_type: 'test' })
+            setFormData({ name: '', station_type: 'functional' })
         },
     })
 
@@ -91,7 +91,7 @@ export function StationsPage() {
                                 >
                                     <option value="intake">Intake</option>
                                     <option value="reset">Reset</option>
-                                    <option value="test">Testing</option>
+                                    <option value="functional">Functional Test</option>
                                     <option value="qc">Quality Control</option>
                                 </select>
                             </div>

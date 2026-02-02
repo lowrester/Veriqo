@@ -1,18 +1,10 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, FileText, Download, Loader2, Plus } from 'lucide-react'
+import { ArrowLeft, FileText, Loader2, Plus } from 'lucide-react'
 import { api } from '@/api/client'
-import { formatDate } from '@/types'
-
-interface Report {
-    id: string
-    scope: string
-    variant: string
-    generated_at: string
-    expires_at: string
-    public_url: string
-}
+import { Report } from '@/types'
+import { ReportList } from './components/ReportList'
 
 interface Job {
     id: string
@@ -129,44 +121,7 @@ export function ReportsPage() {
                     <div className="card">
                         <h2 className="font-semibold text-gray-900 mb-4">Generated Reports</h2>
 
-                        {reportsLoading ? (
-                            <div className="text-center py-8 text-gray-500">Loading reports...</div>
-                        ) : reports.length === 0 ? (
-                            <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                                <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                <p className="text-gray-500">No reports generated yet.</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                {reports.map((report) => (
-                                    <div key={report.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-white rounded border border-gray-200">
-                                                <FileText className="w-5 h-5 text-red-500" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium text-gray-900 capitalize">
-                                                    {report.variant} Report
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {formatDate(report.generated_at)} • {report.scope}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <a
-                                            href={report.public_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="btn-white text-sm flex items-center gap-2"
-                                        >
-                                            <Download className="w-4 h-4" />
-                                            Download
-                                        </a>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        <ReportList reports={reports} isLoading={reportsLoading} />
                     </div>
                 </div>
             </div>
