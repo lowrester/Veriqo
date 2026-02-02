@@ -9,6 +9,7 @@ import { JobDetailPage } from '@/features/jobs/JobDetailPage'
 import { NewJobPage } from '@/features/jobs/NewJobPage'
 import { RunnerPage } from '@/features/runner/RunnerPage'
 import { QcPage } from '@/features/qc/QcPage'
+import { ReportsPage } from '@/features/reports/ReportsPage'
 import { IntakeNewPage } from '@/features/intake/IntakeNewPage'
 import { SearchPage } from '@/features/search/SearchPage'
 import { OpsPage } from '@/features/ops/OpsPage'
@@ -16,6 +17,9 @@ import { UsersPage } from '@/features/users/UsersPage'
 import { NewUserPage } from '@/features/users/NewUserPage'
 import { UserDetailPage } from '@/features/users/UserDetailPage'
 import { AdminPage } from '@/features/admin/AdminPage'
+import { StationsPage } from '@/features/admin/StationsPage'
+import { TemplatesPage } from '@/features/admin/TemplatesPage'
+import { DeviceTypesPage } from '@/features/admin/DeviceTypesPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -73,6 +77,14 @@ function App() {
             </RequireRole>
           }
         />
+        <Route
+          path="job/:id/reports"
+          element={
+            <RequireRole anyOf={['admin', 'supervisor', 'technician', 'viewer']}>
+              <ReportsPage />
+            </RequireRole>
+          }
+        />
 
         {/* Search & Ops */}
         <Route path="search" element={<SearchPage />} />
@@ -87,6 +99,9 @@ function App() {
 
         {/* Admin */}
         <Route path="admin" element={<AdminPage />} />
+        <Route path="admin/stations" element={<StationsPage />} />
+        <Route path="admin/templates" element={<TemplatesPage />} />
+        <Route path="admin/devices" element={<DeviceTypesPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="users/new" element={<NewUserPage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
