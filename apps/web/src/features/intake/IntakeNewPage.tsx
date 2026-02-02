@@ -35,14 +35,14 @@ export function IntakeNewPage() {
                     <ArrowLeft className="w-4 h-4" />
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Skapa nytt jobb</h1>
-                    <p className="text-gray-500 mt-1">Registrera enhet och starta verifiering</p>
+                    <h1 className="text-2xl font-bold text-gray-900">New Job Intake</h1>
+                    <p className="text-gray-500 mt-1">Register device and start verification</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit} className="card space-y-4">
                 <div>
-                    <label className="label">Serienummer *</label>
+                    <label className="label">Serial Number *</label>
                     <input
                         type="text"
                         required
@@ -51,13 +51,13 @@ export function IntakeNewPage() {
                             setFormData({ ...formData, serial_number: e.target.value })
                         }
                         className="input"
-                        placeholder="t.ex. ABC123456"
+                        placeholder="e.g. ABC123456"
                     />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="label">Plattform *</label>
+                        <label className="label">Platform *</label>
                         <select
                             required
                             value={formData.platform}
@@ -66,7 +66,7 @@ export function IntakeNewPage() {
                             }
                             className="input"
                         >
-                            <option value="">Välj plattform</option>
+                            <option value="">Select Platform</option>
                             <option value="playstation">PlayStation</option>
                             <option value="xbox">Xbox</option>
                             <option value="nintendo">Nintendo</option>
@@ -74,21 +74,21 @@ export function IntakeNewPage() {
                     </div>
 
                     <div>
-                        <label className="label">Modell *</label>
+                        <label className="label">Model *</label>
                         <input
                             type="text"
                             required
                             value={formData.model}
                             onChange={(e) => setFormData({ ...formData, model: e.target.value })}
                             className="input"
-                            placeholder="t.ex. PS5 Digital"
+                            placeholder="e.g. PS5 Digital"
                         />
                     </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="label">Kundreferens</label>
+                        <label className="label">Customer Reference</label>
                         <input
                             type="text"
                             value={formData.customer_reference}
@@ -100,7 +100,7 @@ export function IntakeNewPage() {
                     </div>
 
                     <div>
-                        <label className="label">Batch-ID</label>
+                        <label className="label">Batch ID</label>
                         <input
                             type="text"
                             value={formData.batch_id}
@@ -113,7 +113,7 @@ export function IntakeNewPage() {
                 </div>
 
                 <div>
-                    <label className="label">Skicknot vid intag</label>
+                    <label className="label">Condition Notes (Intake)</label>
                     <textarea
                         value={formData.condition_notes}
                         onChange={(e) =>
@@ -121,7 +121,7 @@ export function IntakeNewPage() {
                         }
                         className="input"
                         rows={3}
-                        placeholder="Beskriv enhetens skick..."
+                        placeholder="Describe initial device condition..."
                     />
                 </div>
 
@@ -132,16 +132,16 @@ export function IntakeNewPage() {
                         className="btn-primary flex items-center gap-2"
                     >
                         <Save className="w-4 h-4" />
-                        {createMutation.isPending ? 'Skapar...' : 'Skapa jobb'}
+                        {createMutation.isPending ? 'Creating...' : 'Create Job'}
                     </button>
                     <Link to="/dashboard" className="btn-secondary">
-                        Avbryt
+                        Cancel
                     </Link>
                 </div>
 
                 {createMutation.isError && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-                        Ett fel uppstod. Försök igen.
+                        An error occurred. Please try again.
                     </div>
                 )}
             </form>

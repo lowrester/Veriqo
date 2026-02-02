@@ -53,21 +53,21 @@ export function QcPage() {
     })
 
     if (jobLoading || stepsLoading || !job) {
-        return <div className="text-center py-12">Laddar QC-data...</div>
+        return <div className="text-center py-12">Loading QC data...</div>
     }
 
     const handleApprove = () => {
-        if (window.confirm('Är du säker på att du vill godkänna detta jobb?')) {
+        if (window.confirm('Are you sure you want to approve this job?')) {
             qcMutation.mutate({ decision: 'approve', notes: qcNotes })
         }
     }
 
     const handleReject = () => {
         if (!qcNotes.trim()) {
-            alert('Du måste ange en anledning för avslag.')
+            alert('You must provide a reason for rejection.')
             return
         }
-        if (window.confirm('Detta skickar tillbaka jobbet till Intag/Reset. Är du säker?')) {
+        if (window.confirm('This will return the job to Intake/Reset. Are you sure?')) {
             qcMutation.mutate({ decision: 'reject', notes: qcNotes })
         }
     }
@@ -95,7 +95,7 @@ export function QcPage() {
                 {/* Left Column: Test Results */}
                 <div className="lg:col-span-2 space-y-4">
                     <div className="card">
-                        <h2 className="font-semibold text-gray-900 mb-4">Testresultat</h2>
+                        <h2 className="font-semibold text-gray-900 mb-4">Test Results</h2>
                         <div className="space-y-4">
                             {steps.map((step) => (
                                 <div key={step.id} className="border border-gray-100 rounded-lg p-3 bg-gray-50">
@@ -112,13 +112,13 @@ export function QcPage() {
 
                                     {step.notes && (
                                         <p className="text-sm text-gray-600 mb-2 bg-white p-2 rounded border border-gray-200">
-                                            Notering: {step.notes}
+                                            Note: {step.notes}
                                         </p>
                                     )}
 
                                     {step.evidence && step.evidence.length > 0 && (
                                         <div className="mt-2">
-                                            <p className="text-xs text-gray-500 mb-1">Bevis:</p>
+                                            <p className="text-xs text-gray-500 mb-1">Evidence:</p>
                                             <EvidenceGallery items={step.evidence} />
                                         </div>
                                     )}
@@ -131,14 +131,14 @@ export function QcPage() {
                 {/* Right Column: Decision */}
                 <div className="space-y-6">
                     <div className="card sticky top-20">
-                        <h2 className="font-semibold text-gray-900 mb-4">Beslut</h2>
+                        <h2 className="font-semibold text-gray-900 mb-4">Decision</h2>
 
                         <div className="space-y-4">
                             <div>
-                                <label className="label">QC Noteringar *</label>
+                                <label className="label">QC Notes *</label>
                                 <textarea
                                     className="input min-h-[120px]"
-                                    placeholder="Ange kommentarer här (krävs vid avslag)..."
+                                    placeholder="Enter comments here (required for rejection)..."
                                     value={qcNotes}
                                     onChange={(e) => setQcNotes(e.target.value)}
                                 />
@@ -151,7 +151,7 @@ export function QcPage() {
                                     className="btn bg-green-600 text-white hover:bg-green-700 flex items-center justify-center gap-2"
                                 >
                                     <CheckCircle className="w-4 h-4" />
-                                    Godkänn Jobb
+                                    Approve Job
                                 </button>
 
                                 <button
@@ -160,7 +160,7 @@ export function QcPage() {
                                     className="btn bg-red-600 text-white hover:bg-red-700 flex items-center justify-center gap-2"
                                 >
                                     <RotateCcw className="w-4 h-4" />
-                                    Avslå & Returnera
+                                    Reject & Return
                                 </button>
                             </div>
                         </div>

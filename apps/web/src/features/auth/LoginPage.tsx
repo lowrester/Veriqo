@@ -27,7 +27,7 @@ export function LoginPage() {
 
       navigate('/')
     } catch (err) {
-      setError('Felaktigt användarnamn eller lösenord')
+      setError('Invalid username or password')
     } finally {
       setIsLoading(false)
     }
@@ -52,7 +52,7 @@ export function LoginPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                E-post
+                Email
               </label>
               <input
                 id="email"
@@ -60,7 +60,7 @@ export function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input"
-                placeholder="din@email.se"
+                placeholder="you@example.com"
                 required
                 autoComplete="email"
               />
@@ -68,7 +68,7 @@ export function LoginPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Lösenord
+                Password
               </label>
               <input
                 id="password"
@@ -90,10 +90,10 @@ export function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Loggar in...
+                  Logging in...
                 </>
               ) : (
-                'Logga in'
+                'Log In'
               )}
             </button>
           </form>

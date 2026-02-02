@@ -23,7 +23,7 @@ export function StationsPage() {
     // Fetch stations
     const { data: stations = [], isLoading } = useQuery<Station[]>({
         queryKey: ['stations'],
-        queryFn: () => api.get('/admin/stations'), // Assuming this endpoint exists/will exist
+        queryFn: () => api.get('/admin/stations'),
     })
 
     // Create Station
@@ -53,46 +53,46 @@ export function StationsPage() {
         <div className="max-w-4xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Stationer</h1>
-                    <p className="text-gray-500 mt-1">Hantera arbetsstationer och deras roller</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Stations</h1>
+                    <p className="text-gray-500 mt-1">Manage physical stations and their roles</p>
                 </div>
                 <button
                     onClick={() => setIsCreating(true)}
                     className="btn-primary flex items-center gap-2"
                 >
                     <Plus className="w-4 h-4" />
-                    Ny Station
+                    New Station
                 </button>
             </div>
 
             {isCreating && (
                 <div className="card border-2 border-blue-100 animate-in slide-in-from-top-2">
-                    <h2 className="font-semibold text-gray-900 mb-4">Lägg till ny station</h2>
+                    <h2 className="font-semibold text-gray-900 mb-4">Add New Station</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="label">Stationsnamn</label>
+                                <label className="label">Station Name</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="input"
-                                    placeholder="t.ex. Workbench 1"
+                                    placeholder="e.g. Workbench 1"
                                 />
                             </div>
                             <div>
-                                <label className="label">Typ</label>
+                                <label className="label">Type</label>
                                 <select
                                     required
                                     value={formData.station_type}
                                     onChange={(e) => setFormData({ ...formData, station_type: e.target.value })}
                                     className="input"
                                 >
-                                    <option value="intake">Intag</option>
-                                    <option value="reset">Återställning</option>
-                                    <option value="test">Testning</option>
-                                    <option value="qc">Kvalitetskontroll</option>
+                                    <option value="intake">Intake</option>
+                                    <option value="reset">Reset</option>
+                                    <option value="test">Testing</option>
+                                    <option value="qc">Quality Control</option>
                                 </select>
                             </div>
                         </div>
@@ -103,7 +103,7 @@ export function StationsPage() {
                                 className="btn-primary flex items-center gap-2"
                             >
                                 <Save className="w-4 h-4" />
-                                Spara
+                                Save
                             </button>
                             <button
                                 type="button"
@@ -111,7 +111,7 @@ export function StationsPage() {
                                 className="btn-secondary flex items-center gap-2"
                             >
                                 <X className="w-4 h-4" />
-                                Avbryt
+                                Cancel
                             </button>
                         </div>
                     </form>
@@ -120,9 +120,9 @@ export function StationsPage() {
 
             <div className="card">
                 {isLoading ? (
-                    <div className="text-center py-8 text-gray-500">Laddar stationer...</div>
+                    <div className="text-center py-8 text-gray-500">Loading stations...</div>
                 ) : stations.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">Inga stationer konfigurerade.</div>
+                    <div className="text-center py-12 text-gray-500">No stations configured.</div>
                 ) : (
                     <div className="space-y-2">
                         {stations.map((station) => (
@@ -142,7 +142,7 @@ export function StationsPage() {
                                             <span>•</span>
                                             <span className="flex items-center gap-1">
                                                 <Activity className="w-3 h-3" />
-                                                Aktiv: {station.last_active_at ? formatDate(station.last_active_at) : 'Aldrig'}
+                                                Active: {station.last_active_at ? formatDate(station.last_active_at) : 'Never'}
                                             </span>
                                         </div>
                                     </div>
@@ -150,7 +150,7 @@ export function StationsPage() {
 
                                 <button
                                     onClick={() => {
-                                        if (window.confirm('Är du säker på att du vill ta bort denna station?')) {
+                                        if (window.confirm('Are you sure you want to delete this station?')) {
                                             deleteMutation.mutate(station.id)
                                         }
                                     }}

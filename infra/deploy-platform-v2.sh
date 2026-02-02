@@ -15,6 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 APP_DIR="/opt/veriqo/app"
 WEB_DIR="$APP_DIR/apps/web"
+API_DIR="$APP_DIR/apps/api"
 VERIQO_USER="veriqo"
 BRANCH="platform-v2"
 
@@ -48,10 +49,9 @@ echo -e "${BLUE}🔨 Building frontend...${NC}"
 # Build frontend
 sudo -u "$VERIQO_USER" npm run build
 
-# TODO: Run database migrations when they are ready
-# echo -e "${BLUE}🗄️ Running database migrations...${NC}"
-# cd "$API_DIR"
-# sudo -u "$VERIQO_USER" alembic upgrade head
+echo -e "${BLUE}🗄️ Running database migrations...${NC}"
+cd "$API_DIR" || exit 1
+sudo -u "$VERIQO_USER" alembic upgrade head
 
 echo -e "${BLUE}🔄 Restarting services...${NC}"
 systemctl restart veriqo-api

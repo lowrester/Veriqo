@@ -10,15 +10,15 @@ import { useAuthStore } from '@/stores/authStore'
 const ROLES: { value: UserRole; label: string }[] = [
     { value: 'admin', label: 'Admin' },
     { value: 'supervisor', label: 'Supervisor' },
-    { value: 'technician', label: 'Tekniker' },
-    { value: 'viewer', label: 'Granskare' },
+    { value: 'technician', label: 'Technician' },
+    { value: 'viewer', label: 'Viewer' },
 ]
 
 const ROLE_LABELS: Record<UserRole, string> = {
     admin: 'Admin',
     supervisor: 'Supervisor',
-    technician: 'Tekniker',
-    viewer: 'Granskare',
+    technician: 'Technician',
+    viewer: 'Viewer',
 }
 
 export function UserDetailPage() {
@@ -90,9 +90,9 @@ export function UserDetailPage() {
     if (!user) {
         return (
             <div className="text-center py-12">
-                <p className="text-gray-500">Användaren hittades inte</p>
+                <p className="text-gray-500">User not found</p>
                 <button onClick={() => navigate('/users')} className="btn-secondary mt-4">
-                    Tillbaka till användare
+                    Back to Users
                 </button>
             </div>
         )
@@ -107,7 +107,7 @@ export function UserDetailPage() {
                     className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-2"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Tillbaka till användare
+                    Back to Users
                 </button>
                 <div className="flex items-start justify-between">
                     <div>
@@ -117,7 +117,7 @@ export function UserDetailPage() {
                     {isAdmin && !isEditing && (
                         <button onClick={handleEdit} className="btn-secondary flex items-center gap-2">
                             <Edit2 className="w-4 h-4" />
-                            Redigera
+                            Edit
                         </button>
                     )}
                 </div>
@@ -129,7 +129,7 @@ export function UserDetailPage() {
                     {updateMutation.isError && (
                         <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-lg">
                             <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                            Kunde inte uppdatera användaren. Försök igen.
+                            Could not update user. Please try again.
                         </div>
                     )}
 
@@ -138,7 +138,7 @@ export function UserDetailPage() {
                             htmlFor="full_name"
                             className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                            Fullständigt namn
+                            Full Name
                         </label>
                         <input
                             id="full_name"
@@ -153,7 +153,7 @@ export function UserDetailPage() {
 
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                            E-postadress
+                            Email Address
                         </label>
                         <input
                             id="email"
@@ -168,7 +168,7 @@ export function UserDetailPage() {
 
                     <div>
                         <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                            Roll
+                            Role
                         </label>
                         <select
                             id="role"
@@ -196,7 +196,7 @@ export function UserDetailPage() {
                             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
-                            Aktiv användare
+                            Active User
                         </label>
                     </div>
 
@@ -207,7 +207,7 @@ export function UserDetailPage() {
                             className="btn-secondary flex items-center gap-2"
                         >
                             <X className="w-4 h-4" />
-                            Avbryt
+                            Cancel
                         </button>
                         <button
                             type="submit"
@@ -217,12 +217,12 @@ export function UserDetailPage() {
                             {updateMutation.isPending ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    Sparar...
+                                    Saving...
                                 </>
                             ) : (
                                 <>
                                     <Save className="w-4 h-4" />
-                                    Spara
+                                    Save
                                 </>
                             )}
                         </button>
@@ -230,13 +230,13 @@ export function UserDetailPage() {
                 </form>
             ) : (
                 <div className="card">
-                    <h2 className="font-semibold text-gray-900 mb-4">Detaljer</h2>
+                    <h2 className="font-semibold text-gray-900 mb-4">Details</h2>
                     <dl className="space-y-3">
-                        <DetailRow label="Namn" value={user.full_name} />
-                        <DetailRow label="E-post" value={user.email} />
-                        <DetailRow label="Roll" value={ROLE_LABELS[user.role]} />
-                        <DetailRow label="Status" value={user.is_active ? 'Aktiv' : 'Inaktiv'} />
-                        <DetailRow label="Skapad" value={formatDate(user.created_at)} />
+                        <DetailRow label="Name" value={user.full_name} />
+                        <DetailRow label="Email" value={user.email} />
+                        <DetailRow label="Role" value={ROLE_LABELS[user.role]} />
+                        <DetailRow label="Status" value={user.is_active ? 'Active' : 'Inactive'} />
+                        <DetailRow label="Created" value={formatDate(user.created_at)} />
                     </dl>
                 </div>
             )}

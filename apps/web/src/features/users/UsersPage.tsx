@@ -9,8 +9,8 @@ import { useAuthStore } from '@/stores/authStore'
 const ROLE_LABELS: Record<UserRole, string> = {
     admin: 'Admin',
     supervisor: 'Supervisor',
-    technician: 'Tekniker',
-    viewer: 'Granskare',
+    technician: 'Technician',
+    viewer: 'Viewer',
 }
 
 const ROLE_COLORS: Record<UserRole, string> = {
@@ -48,7 +48,7 @@ export function UsersPage() {
     const handleDelete = async (userId: string, userName: string) => {
         if (
             !confirm(
-                `Är du säker på att du vill ta bort användaren "${userName}"? Detta kan inte ångras.`
+                `Are you sure you want to delete user "${userName}"? This cannot be undone.`
             )
         ) {
             return
@@ -57,7 +57,7 @@ export function UsersPage() {
         try {
             await deleteMutation.mutateAsync(userId)
         } catch (error) {
-            alert('Kunde inte ta bort användaren. Försök igen.')
+            alert('Could not delete user. Please try again.')
         }
     }
 
@@ -66,13 +66,13 @@ export function UsersPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Användare</h1>
-                    <p className="text-gray-500">Hantera systemanvändare och behörigheter</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+                    <p className="text-gray-500">Manage system users and permissions</p>
                 </div>
                 {isAdmin && (
                     <Link to="/users/new" className="btn-primary flex items-center gap-2">
                         <Plus className="w-4 h-4" />
-                        Ny användare
+                        New User
                     </Link>
                 )}
             </div>
@@ -85,7 +85,7 @@ export function UsersPage() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Sök namn eller e-post..."
+                        placeholder="Search name or email..."
                         className="input pl-10"
                     />
                 </div>
@@ -94,10 +94,10 @@ export function UsersPage() {
             {/* Users list */}
             <div className="card p-0 overflow-hidden">
                 {isLoading ? (
-                    <div className="text-center py-12 text-gray-500">Laddar användare...</div>
+                    <div className="text-center py-12 text-gray-500">Loading users...</div>
                 ) : filteredUsers.length === 0 ? (
                     <div className="text-center py-12 text-gray-500">
-                        {searchQuery ? 'Inga användare matchar din sökning' : 'Inga användare ännu'}
+                        {searchQuery ? 'No users found matching your search' : 'No users yet'}
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
@@ -105,23 +105,23 @@ export function UsersPage() {
                             <thead>
                                 <tr className="border-b border-gray-200 bg-gray-50">
                                     <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
-                                        Namn
+                                        Name
                                     </th>
                                     <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 hidden sm:table-cell">
-                                        E-post
+                                        Email
                                     </th>
                                     <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
-                                        Roll
+                                        Role
                                     </th>
                                     <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 hidden md:table-cell">
                                         Status
                                     </th>
                                     <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 hidden lg:table-cell">
-                                        Skapad
+                                        Created
                                     </th>
                                     {isAdmin && (
                                         <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
-                                            Åtgärder
+                                            Actions
                                         </th>
                                     )}
                                 </tr>
@@ -152,7 +152,7 @@ export function UsersPage() {
                                                     : 'bg-gray-100 text-gray-800'
                                                     }`}
                                             >
-                                                {user.is_active ? 'Aktiv' : 'Inaktiv'}
+                                                {user.is_active ? 'Active' : 'Inactive'}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-sm text-gray-500 hidden lg:table-cell">
@@ -164,7 +164,7 @@ export function UsersPage() {
                                                     <Link
                                                         to={`/users/${user.id}`}
                                                         className="text-gray-600 hover:text-blue-600 transition-colors"
-                                                        title="Redigera"
+                                                        title="Edit"
                                                     >
                                                         <Edit className="w-4 h-4" />
                                                     </Link>
@@ -173,7 +173,7 @@ export function UsersPage() {
                                                             onClick={() => handleDelete(user.id, user.full_name)}
                                                             disabled={deleteMutation.isPending}
                                                             className="text-gray-600 hover:text-red-600 transition-colors disabled:opacity-50"
-                                                            title="Ta bort"
+                                                            title="Delete"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>

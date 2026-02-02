@@ -8,8 +8,8 @@ import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react'
 const ROLES: { value: UserRole; label: string }[] = [
     { value: 'admin', label: 'Admin' },
     { value: 'supervisor', label: 'Supervisor' },
-    { value: 'technician', label: 'Tekniker' },
-    { value: 'viewer', label: 'Granskare' },
+    { value: 'technician', label: 'Technician' },
+    { value: 'viewer', label: 'Viewer' },
 ]
 
 export function NewUserPage() {
@@ -35,12 +35,12 @@ export function NewUserPage() {
         e.preventDefault()
 
         if (formData.password !== passwordConfirm) {
-            alert('Lösenorden matchar inte')
+            alert('Passwords do not match')
             return
         }
 
         if (formData.password.length < 8) {
-            alert('Lösenordet måste vara minst 8 tecken')
+            alert('Password must be at least 8 characters long')
             return
         }
 
@@ -63,10 +63,10 @@ export function NewUserPage() {
                     className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-2"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Tillbaka till användare
+                    Back to Users
                 </button>
-                <h1 className="text-2xl font-bold text-gray-900">Ny användare</h1>
-                <p className="text-gray-500">Skapa en ny systemanvändare</p>
+                <h1 className="text-2xl font-bold text-gray-900">New User</h1>
+                <p className="text-gray-500">Create a new system user</p>
             </div>
 
             {/* Form */}
@@ -74,7 +74,7 @@ export function NewUserPage() {
                 {createMutation.isError && (
                     <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-lg">
                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                        Kunde inte skapa användaren. E-postadressen kanske redan används.
+                        Could not create user. Email address might already be in use.
                     </div>
                 )}
 
@@ -83,7 +83,7 @@ export function NewUserPage() {
                         htmlFor="email"
                         className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                        E-postadress *
+                        Email Address *
                     </label>
                     <input
                         id="email"
@@ -102,7 +102,7 @@ export function NewUserPage() {
                         htmlFor="full_name"
                         className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                        Fullständigt namn *
+                        Full Name *
                     </label>
                     <input
                         id="full_name"
@@ -111,7 +111,7 @@ export function NewUserPage() {
                         value={formData.full_name}
                         onChange={handleChange}
                         className="input"
-                        placeholder="Förnamn Efternamn"
+                        placeholder="First Last"
                         required
                     />
                 </div>
@@ -121,7 +121,7 @@ export function NewUserPage() {
                         htmlFor="role"
                         className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                        Roll *
+                        Role *
                     </label>
                     <select
                         id="role"
@@ -138,7 +138,7 @@ export function NewUserPage() {
                         ))}
                     </select>
                     <p className="mt-1 text-sm text-gray-500">
-                        Bestämmer användarens behörighetsnivå i systemet
+                        Determines the user's permission level in the system
                     </p>
                 </div>
 
@@ -147,7 +147,7 @@ export function NewUserPage() {
                         htmlFor="password"
                         className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                        Lösenord *
+                        Password *
                     </label>
                     <input
                         id="password"
@@ -156,7 +156,7 @@ export function NewUserPage() {
                         value={formData.password}
                         onChange={handleChange}
                         className="input"
-                        placeholder="Minst 8 tecken"
+                        placeholder="Min 8 characters"
                         minLength={8}
                         required
                     />
@@ -167,7 +167,7 @@ export function NewUserPage() {
                         htmlFor="password_confirm"
                         className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                        Bekräfta lösenord *
+                        Confirm Password *
                     </label>
                     <input
                         id="password_confirm"
@@ -176,7 +176,7 @@ export function NewUserPage() {
                         value={passwordConfirm}
                         onChange={(e) => setPasswordConfirm(e.target.value)}
                         className="input"
-                        placeholder="Ange lösenordet igen"
+                        placeholder="Re-enter password"
                         minLength={8}
                         required
                     />
@@ -188,7 +188,7 @@ export function NewUserPage() {
                         onClick={() => navigate('/users')}
                         className="btn-secondary"
                     >
-                        Avbryt
+                        Cancel
                     </button>
                     <button
                         type="submit"
@@ -203,10 +203,10 @@ export function NewUserPage() {
                         {createMutation.isPending ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                Skapar...
+                                Creating...
                             </>
                         ) : (
-                            'Skapa användare'
+                            'Create User'
                         )}
                     </button>
                 </div>

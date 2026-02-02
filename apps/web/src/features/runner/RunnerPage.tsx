@@ -65,7 +65,7 @@ export function RunnerPage() {
     })
 
     if (jobLoading || stepsLoading || !job) {
-        return <div className="text-center py-12">Laddar jobbdata...</div>
+        return <div className="text-center py-12">Loading job data...</div>
     }
 
     const completedSteps = steps.filter((s) => s.status === 'pass' || s.status === 'fail').length
@@ -90,14 +90,14 @@ export function RunnerPage() {
                 </div>
                 <button className="btn-primary flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
-                    Slutför jobb
+                    Complete Job
                 </button>
             </div>
 
             {/* Progress */}
             <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
                 <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-600 font-medium">{completedSteps} av {steps.length} steg klara</span>
+                    <span className="text-gray-600 font-medium">{completedSteps} of {steps.length} steps complete</span>
                     <span className="text-blue-600 font-bold">{Math.round(progress)}%</span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-2.5">
@@ -112,7 +112,7 @@ export function RunnerPage() {
             <div className="space-y-4">
                 {steps.length === 0 ? (
                     <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <p className="text-gray-500">Inga teststeg konfigurerade för denna enhetstyp.</p>
+                        <p className="text-gray-500">No test steps configured for this device type.</p>
                     </div>
                 ) : (
                     steps.map((step) => (

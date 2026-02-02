@@ -50,7 +50,7 @@ export function ReportsPage() {
         },
         onError: () => {
             setGenerating(false)
-            alert('Kunde inte generera rapport. Försök igen.')
+            alert('Could not generate report. Please try again.')
         },
     })
 
@@ -60,7 +60,7 @@ export function ReportsPage() {
     }
 
     if (jobLoading || !job) {
-        return <div className="text-center py-12">Laddar...</div>
+        return <div className="text-center py-12">Loading...</div>
     }
 
     return (
@@ -87,7 +87,7 @@ export function ReportsPage() {
                 <div className="card h-fit">
                     <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         <Plus className="w-4 h-4" />
-                        Ny Rapport
+                        New Report
                     </h2>
                     <div className="space-y-3">
                         <button
@@ -97,7 +97,7 @@ export function ReportsPage() {
                         >
                             <div className="text-left">
                                 <p className="font-medium text-gray-900">Standard</p>
-                                <p className="text-xs text-gray-500">Testresultat och sammanfattning</p>
+                                <p className="text-xs text-gray-500">Test results and summary</p>
                             </div>
                             {generating ? (
                                 <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
@@ -112,8 +112,8 @@ export function ReportsPage() {
                             className="w-full btn-white justify-between group"
                         >
                             <div className="text-left">
-                                <p className="font-medium text-gray-900">Detaljerad</p>
-                                <p className="text-xs text-gray-500">Inkluderar alla bevis och loggar</p>
+                                <p className="font-medium text-gray-900">Detailed</p>
+                                <p className="text-xs text-gray-500">Includes all evidence and logs</p>
                             </div>
                             {generating ? (
                                 <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
@@ -127,14 +127,14 @@ export function ReportsPage() {
                 {/* Existing Reports List */}
                 <div className="md:col-span-2">
                     <div className="card">
-                        <h2 className="font-semibold text-gray-900 mb-4">Genererade Rapporter</h2>
+                        <h2 className="font-semibold text-gray-900 mb-4">Generated Reports</h2>
 
                         {reportsLoading ? (
-                            <div className="text-center py-8 text-gray-500">Laddar rapporter...</div>
+                            <div className="text-center py-8 text-gray-500">Loading reports...</div>
                         ) : reports.length === 0 ? (
                             <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
                                 <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                <p className="text-gray-500">Inga rapporter har skapats ännu.</p>
+                                <p className="text-gray-500">No reports generated yet.</p>
                             </div>
                         ) : (
                             <div className="space-y-3">
@@ -161,7 +161,7 @@ export function ReportsPage() {
                                             className="btn-white text-sm flex items-center gap-2"
                                         >
                                             <Download className="w-4 h-4" />
-                                            Ladda ner
+                                            Download
                                         </a>
                                     </div>
                                 ))}

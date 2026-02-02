@@ -37,12 +37,12 @@ export function JobsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Jobb</h1>
-          <p className="text-gray-500">Hantera alla verifieringsjobb</p>
+          <h1 className="text-2xl font-bold text-gray-900">Jobs</h1>
+          <p className="text-gray-500">Manage all verification jobs</p>
         </div>
         <Link to="/jobs/new" className="btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" />
-          Nytt jobb
+          New Job
         </Link>
       </div>
 
@@ -56,7 +56,7 @@ export function JobsPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Sök serienummer, plattform..."
+              placeholder="Search serial number, platform..."
               className="input pl-10"
             />
           </div>
@@ -69,7 +69,7 @@ export function JobsPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="input pl-10 pr-8 appearance-none"
             >
-              <option value="">Alla statusar</option>
+              <option value="">All Statuses</option>
               {STATUSES.map((status) => (
                 <option key={status} value={status}>
                   {STATUS_LABELS[status]}
@@ -83,12 +83,12 @@ export function JobsPage() {
       {/* Jobs list */}
       <div className="card p-0 overflow-hidden">
         {isLoading ? (
-          <div className="text-center py-12 text-gray-500">Laddar jobb...</div>
+          <div className="text-center py-12 text-gray-500">Loading jobs...</div>
         ) : filteredJobs.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             {searchQuery || statusFilter
-              ? 'Inga jobb matchar dina filter'
-              : 'Inga jobb ännu'}
+              ? 'No jobs match your filters'
+              : 'No jobs yet'}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -96,19 +96,19 @@ export function JobsPage() {
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
                   <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
-                    Serienummer
+                    Serial Number
                   </th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 hidden sm:table-cell">
-                    Enhet
+                    Device
                   </th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
                     Status
                   </th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 hidden md:table-cell">
-                    Tekniker
+                    Technician
                   </th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 hidden lg:table-cell">
-                    Skapad
+                    Created
                   </th>
                 </tr>
               </thead>

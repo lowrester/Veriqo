@@ -3,36 +3,36 @@ import { Users, Monitor, FileText, Database } from 'lucide-react'
 
 const adminSections = [
     {
-        title: 'Användare',
-        description: 'Hantera användare och behörigheter',
+        title: 'Users',
+        description: 'Manage users and permissions',
         icon: Users,
         color: 'bg-blue-100 text-blue-600',
         hoverColor: 'group-hover:bg-blue-200',
         path: '/users',
     },
     {
-        title: 'Stationer',
-        description: 'Hantera arbetsstationer och flöden',
+        title: 'Stations',
+        description: 'Manage workflow stations and flows',
         icon: Monitor,
         color: 'bg-green-100 text-green-600',
         hoverColor: 'group-hover:bg-green-200',
         path: '/admin/stations',
     },
     {
-        title: 'Testmallar',
-        description: 'Skapa och redigera testsekvenser',
+        title: 'Test Templates',
+        description: 'Create and edit test sequences',
         icon: FileText,
         color: 'bg-purple-100 text-purple-600',
         hoverColor: 'group-hover:bg-purple-200',
-        path: '/admin/templates', // Will be implemented
+        path: '/admin/templates',
     },
     {
-        title: 'Enhetstyper',
-        description: 'Konfigurera plattformar och modeller',
+        title: 'Device Types',
+        description: 'Configure platforms and models',
         icon: Database,
         color: 'bg-orange-100 text-orange-600',
         hoverColor: 'group-hover:bg-orange-200',
-        path: '/admin/devices', // Will be implemented
+        path: '/admin/devices',
     },
 ]
 
@@ -42,7 +42,7 @@ export function AdminPage() {
             <div>
                 <h1 className="text-2xl font-bold text-gray-900">Administration</h1>
                 <p className="text-gray-500 mt-1">
-                    Här hanterar du globala inställningar och register för Veriqo.
+                    Manage global settings and registries for Veriqo.
                 </p>
             </div>
 

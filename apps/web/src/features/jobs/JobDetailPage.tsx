@@ -86,9 +86,9 @@ export function JobDetailPage() {
   if (!job) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Jobb hittades inte</p>
+        <p className="text-gray-500">Job not found</p>
         <button onClick={() => navigate('/jobs')} className="btn-secondary mt-4">
-          Tillbaka till jobb
+          Back to Jobs
         </button>
       </div>
     )
@@ -104,7 +104,7 @@ export function JobDetailPage() {
             className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Tillbaka till jobb
+            Back to Jobs
           </button>
           <h1 className="text-2xl font-bold text-gray-900">{job.serial_number}</h1>
           <p className="text-gray-500">
@@ -119,7 +119,7 @@ export function JobDetailPage() {
       {/* Workflow actions */}
       {validTransitions.length > 0 && (
         <div className="card">
-          <h2 className="font-semibold text-gray-900 mb-4">Arbetsflöde</h2>
+          <h2 className="font-semibold text-gray-900 mb-4">Workflow Actions</h2>
           <div className="flex flex-wrap gap-3">
             {validTransitions.map((status) => (
               <button
@@ -139,7 +139,7 @@ export function JobDetailPage() {
           </div>
           {transitionMutation.isError && (
             <p className="mt-3 text-sm text-red-600">
-              Kunde inte ändra status. Kontrollera att alla krav är uppfyllda.
+              Could not change status. Please ensure all requirements are met.
             </p>
           )}
         </div>
@@ -148,17 +148,17 @@ export function JobDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Job details */}
         <div className="card">
-          <h2 className="font-semibold text-gray-900 mb-4">Detaljer</h2>
+          <h2 className="font-semibold text-gray-900 mb-4">Job Details</h2>
           <dl className="space-y-3">
-            <DetailRow label="Serienummer" value={job.serial_number} />
-            <DetailRow label="Plattform" value={job.device?.platform || '-'} />
-            <DetailRow label="Modell" value={job.device?.model || '-'} />
-            <DetailRow label="Tekniker" value={job.assigned_technician?.full_name || '-'} />
-            <DetailRow label="Kundreferens" value={job.customer_reference || '-'} />
-            <DetailRow label="Batch" value={job.batch_id || '-'} />
-            <DetailRow label="Skapad" value={formatDate(job.created_at)} />
+            <DetailRow label="Serial Number" value={job.serial_number} />
+            <DetailRow label="Platform" value={job.device?.platform || '-'} />
+            <DetailRow label="Model" value={job.device?.model || '-'} />
+            <DetailRow label="Technician" value={job.assigned_technician?.full_name || '-'} />
+            <DetailRow label="Customer Reference" value={job.customer_reference || '-'} />
+            <DetailRow label="Batch ID" value={job.batch_id || '-'} />
+            <DetailRow label="Created" value={formatDate(job.created_at)} />
             {job.completed_at && (
-              <DetailRow label="Klar" value={formatDate(job.completed_at)} />
+              <DetailRow label="Completed" value={formatDate(job.completed_at)} />
             )}
           </dl>
         </div>
@@ -166,14 +166,14 @@ export function JobDetailPage() {
         {/* Evidence */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-gray-900">Bevis</h2>
+            <h2 className="font-semibold text-gray-900">Evidence</h2>
             <label className="btn-secondary flex items-center gap-2 cursor-pointer">
               {isUploading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <Upload className="w-4 h-4" />
               )}
-              Ladda upp
+              Upload
               <input
                 ref={fileInputRef}
                 type="file"
@@ -188,7 +188,7 @@ export function JobDetailPage() {
           {evidence.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Camera className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p>Inga bevis uppladdade ännu</p>
+              <p>No evidence uploaded yet</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
@@ -218,9 +218,9 @@ export function JobDetailPage() {
 
       {/* History */}
       <div className="card">
-        <h2 className="font-semibold text-gray-900 mb-4">Historik</h2>
+        <h2 className="font-semibold text-gray-900 mb-4">History</h2>
         {history.length === 0 ? (
-          <p className="text-gray-500">Ingen historik ännu</p>
+          <p className="text-gray-500">No history available</p>
         ) : (
           <div className="space-y-3">
             {history.map((entry) => (

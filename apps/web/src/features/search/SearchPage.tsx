@@ -24,9 +24,9 @@ export function SearchPage() {
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Sök jobb</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Search Jobs</h1>
                 <p className="text-gray-500 mt-1">
-                    Sök efter serienummer, batch-ID eller kundreferens
+                    Search by serial number, batch ID or customer reference
                 </p>
             </div>
 
@@ -38,7 +38,7 @@ export function SearchPage() {
                         type="text"
                         value={searchTerm}
                         onChange={(e) => handleSearch(e.target.value)}
-                        placeholder="Ange minst 3 tecken..."
+                        placeholder="Enter at least 3 characters..."
                         className="input pl-10 w-full"
                     />
                 </div>
@@ -54,14 +54,14 @@ export function SearchPage() {
             {!isLoading && debouncedTerm.length >= 3 && results.length === 0 && (
                 <div className="card text-center py-12">
                     <SearchIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-500">Inga resultat hittades</p>
+                    <p className="text-gray-500">No results found</p>
                 </div>
             )}
 
             {!isLoading && results.length > 0 && (
                 <div className="card">
                     <h2 className="font-semibold text-gray-900 mb-4">
-                        {results.length} resultat
+                        {results.length} results
                     </h2>
                     <div className="space-y-2">
                         {results.map((job: any) => (

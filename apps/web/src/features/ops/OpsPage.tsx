@@ -9,15 +9,15 @@ export function OpsPage() {
     })
 
     if (isLoading) {
-        return <div className="text-center py-12">Laddar statistik...</div>
+        return <div className="text-center py-12">Loading stats...</div>
     }
 
     return (
         <div className="max-w-6xl space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Statistik & KPI</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Operations & KPI</h1>
                 <p className="text-gray-500 mt-1">
-                    Översikt över genomströmning och kvalitet
+                    Throughput and quality overview
                 </p>
             </div>
 
@@ -25,25 +25,25 @@ export function OpsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <KpiCard
                     icon={BarChart3}
-                    label="Totalt genomförda"
+                    label="Total Completed"
                     value={stats?.total_completed || 0}
                     color="blue"
                 />
                 <KpiCard
                     icon={TrendingUp}
-                    label="Genomsnittlig tid"
+                    label="Avg Completion Time"
                     value={`${stats?.avg_completion_time || 0}h`}
                     color="green"
                 />
                 <KpiCard
                     icon={CheckCircle}
-                    label="Godkända (%)"
+                    label="Pass Rate (%)"
                     value={`${stats?.pass_rate || 0}%`}
                     color="green"
                 />
                 <KpiCard
                     icon={XCircle}
-                    label="Misslyckade (%)"
+                    label="Fail Rate (%)"
                     value={`${stats?.fail_rate || 0}%`}
                     color="red"
                 />
@@ -52,7 +52,7 @@ export function OpsPage() {
             {/* Throughput by station */}
             <div className="card">
                 <h2 className="font-semibold text-gray-900 mb-4">
-                    Genomströmning per station
+                    Throughput by Station
                 </h2>
                 <div className="space-y-3">
                     {['intake', 'reset', 'test', 'qc'].map((station) => (
@@ -80,10 +80,10 @@ export function OpsPage() {
 
             {/* Recent activity */}
             <div className="card">
-                <h2 className="font-semibold text-gray-900 mb-4">Senaste aktivitet</h2>
+                <h2 className="font-semibold text-gray-900 mb-4">Recent Activity</h2>
                 <div className="space-y-2">
                     <p className="text-sm text-gray-500">
-                        Aktivitetslogg kommer snart...
+                        Activity log coming soon...
                     </p>
                 </div>
             </div>

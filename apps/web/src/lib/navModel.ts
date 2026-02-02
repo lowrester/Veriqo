@@ -21,20 +21,20 @@ export const NAV_ITEMS: NavItem[] = [
         roles: ['admin', 'supervisor', 'technician', 'viewer'],
     },
     {
-        label: 'Skapa Jobb',
+        label: 'New Job',
         path: '/intake/new',
         icon: 'Plus',
         roles: ['admin', 'supervisor', 'technician'],
         stationTypes: ['intake'],
     },
     {
-        label: 'Sök',
+        label: 'Search',
         path: '/search',
         icon: 'Search',
         roles: ['admin', 'supervisor', 'technician', 'viewer'],
     },
     {
-        label: 'Statistik',
+        label: 'Workflow Stats',
         path: '/ops',
         icon: 'BarChart3',
         roles: ['admin', 'supervisor'],

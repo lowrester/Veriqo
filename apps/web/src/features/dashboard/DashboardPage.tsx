@@ -35,34 +35,34 @@ export function DashboardPage() {
       {/* Welcome */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          Välkommen, {user?.full_name}
+          Welcome, {user?.full_name}
         </h1>
-        <p className="text-gray-500">Här är din översikt för idag.</p>
+        <p className="text-gray-500">Here is your overview for today.</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={Clipboard}
-          label="Totalt jobb"
+          label="Total Jobs"
           value={stats.total}
           color="blue"
         />
         <StatCard
           icon={Clock}
-          label="Pågående"
+          label="In Progress"
           value={stats.inProgress}
           color="yellow"
         />
         <StatCard
           icon={CheckCircle}
-          label="Klara"
+          label="Completed"
           value={stats.completed}
           color="green"
         />
         <StatCard
           icon={AlertCircle}
-          label="Misslyckade"
+          label="Failed"
           value={stats.failed}
           color="red"
         />
@@ -70,14 +70,14 @@ export function DashboardPage() {
 
       {/* Quick actions */}
       <div className="card">
-        <h2 className="font-semibold text-gray-900 mb-4">Snabbåtgärder</h2>
+        <h2 className="font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="flex flex-wrap gap-3">
           <Link to="/jobs/new" className="btn-primary flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            Nytt jobb
+            New Job
           </Link>
           <Link to="/jobs" className="btn-secondary flex items-center gap-2">
-            Visa alla jobb
+            View All Jobs
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -86,22 +86,22 @@ export function DashboardPage() {
       {/* Recent jobs */}
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-900">Senaste jobb</h2>
+          <h2 className="font-semibold text-gray-900">Recent Jobs</h2>
           <Link
             to="/jobs"
             className="text-sm text-blue-600 hover:text-blue-700"
           >
-            Visa alla
+            View All
           </Link>
         </div>
 
         {isLoading ? (
-          <div className="text-center py-8 text-gray-500">Laddar...</div>
+          <div className="text-center py-8 text-gray-500">Loading...</div>
         ) : jobs.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            Inga jobb ännu.{' '}
+            No jobs yet.{' '}
             <Link to="/jobs/new" className="text-blue-600 hover:underline">
-              Skapa ett nytt jobb
+              Create a new job
             </Link>
           </div>
         ) : (
