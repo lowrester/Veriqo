@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/authStore'
 import {
   LayoutDashboard,
   Clipboard,
+  Users,
   LogOut,
   Menu,
   X,
@@ -11,7 +12,8 @@ import { useState } from 'react'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Jobs', href: '/jobs', icon: Clipboard },
+  { name: 'Jobb', href: '/jobs', icon: Clipboard },
+  { name: 'Användare', href: '/users', icon: Users, adminOnly: true },
 ]
 
 export function Layout() {
@@ -37,9 +39,8 @@ export function Layout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -57,26 +58,27 @@ export function Layout() {
 
           {/* Navigation */}
           <nav className="flex-1 px-3 py-4 space-y-1">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href ||
-                (item.href !== '/' && location.pathname.startsWith(item.href))
+            {navigation
+              .filter((item) => !item.adminOnly || user?.role === 'admin' || user?.role === 'supervisor')
+              .map((item) => {
+                const isActive = location.pathname === item.href ||
+                  (item.href !== '/' && location.pathname.startsWith(item.href))
 
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <item.icon className="w-5 h-5" />
-                  {item.name}
-                </Link>
-              )
-            })}
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    {item.name}
+                  </Link>
+                )
+              })}
           </nav>
 
           {/* User section */}

@@ -6,6 +6,9 @@ import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { JobsPage } from '@/features/jobs/JobsPage'
 import { JobDetailPage } from '@/features/jobs/JobDetailPage'
 import { NewJobPage } from '@/features/jobs/NewJobPage'
+import { UsersPage } from '@/features/users/UsersPage'
+import { NewUserPage } from '@/features/users/NewUserPage'
+import { UserDetailPage } from '@/features/users/UserDetailPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -34,6 +37,9 @@ function App() {
         <Route path="jobs" element={<JobsPage />} />
         <Route path="jobs/new" element={<NewJobPage />} />
         <Route path="jobs/:id" element={<JobDetailPage />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="users/new" element={<NewUserPage />} />
+        <Route path="users/:id" element={<UserDetailPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

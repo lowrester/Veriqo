@@ -15,6 +15,21 @@ export interface User {
   full_name: string
   role: UserRole
   is_active: boolean
+  created_at: string
+}
+
+export interface CreateUserData {
+  email: string
+  full_name: string
+  role: UserRole
+  password: string
+}
+
+export interface UpdateUserData {
+  email?: string
+  full_name?: string
+  role?: UserRole
+  is_active?: boolean
 }
 
 export const STATUS_LABELS: Record<JobStatus, string> = {
