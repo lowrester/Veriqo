@@ -148,3 +148,38 @@ class JobHistoryResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class EvidenceSummary(BaseModel):
+    """Evidence item summary."""
+    id: str
+    original_filename: str
+    evidence_type: str
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+
+class TestStepResponse(BaseModel):
+    """Workflow step with current result status."""
+    id: str
+    name: str
+    description: Optional[str] = None
+    sequence_order: int
+    is_mandatory: bool
+    requires_evidence: bool
+    
+    # Result info
+    status: str = "pending"
+    notes: Optional[str] = None
+    evidence: list[EvidenceSummary] = []
+    
+    class Config:
+        from_attributes = True
+
+
+class TestResultCreate(BaseModel):
+    """Schema for submitting a test result."""
+    status: str
+    notes: Optional[str] = None

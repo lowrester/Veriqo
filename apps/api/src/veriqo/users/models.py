@@ -8,30 +8,20 @@ from sqlalchemy import Boolean, String
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from veriqo.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from veriqo.jobs.models import JobStatus
 
-
-class UserRole(str, Enum):
-    """User roles for access control."""
-
-    ADMIN = "admin"
-    SUPERVISOR = "supervisor"
-    TECHNICIAN = "technician"
-    VIEWER = "viewer"
-
+# ... imports ...
 
 class User(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
-    """User model for authentication and authorization."""
-
-    __tablename__ = "users"
-
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    # ... existing columns ...
     role: Mapped[UserRole] = mapped_column(
         ENUM(UserRole, name="user_role", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=UserRole.TECHNICIAN,
+    )
+    station_type: Mapped[JobStatus | None] = mapped_column(
+        ENUM(JobStatus, name="job_status", create_type=False),
+        nullable=True,
     )
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
