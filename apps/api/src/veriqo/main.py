@@ -7,6 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from veriqo.config import get_settings
 
+# Import all models to ensure SQLAlchemy registration
+import veriqo.models  # noqa: F401
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
