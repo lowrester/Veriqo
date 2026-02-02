@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '@/api/client'
-import type { CreateUserData, UserRole } from '@/types'
+import type { CreateUserData, UserRole, User } from '@/types'
 import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react'
 
 const ROLES: { value: UserRole; label: string }[] = [
@@ -26,7 +26,7 @@ export function NewUserPage() {
 
     const createMutation = useMutation({
         mutationFn: (data: CreateUserData) => api.createUser(data),
-        onSuccess: (user) => {
+        onSuccess: (user: User) => {
             navigate(`/users/${user.id}`)
         },
     })

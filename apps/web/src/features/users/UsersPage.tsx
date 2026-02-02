@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { api } from '@/api/client'
-import { formatDate, type User, type UserRole } from '@/types'
+import { formatDate, type User as UserType, type UserRole } from '@/types'
 import { Plus, Search, Trash2, Edit } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -26,7 +26,7 @@ export function UsersPage() {
     const currentUser = useAuthStore((state) => state.user)
     const isAdmin = currentUser?.role === 'admin'
 
-    const { data: users = [], isLoading } = useQuery({
+    const { data: users = [], isLoading } = useQuery<UserType[]>({
         queryKey: ['users'],
         queryFn: () => api.getUsers(),
     })
@@ -40,7 +40,7 @@ export function UsersPage() {
 
     // Filter by search query
     const filteredUsers = users.filter(
-        (user) =>
+        (user: UserType) =>
             user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
             user.full_name.toLowerCase().includes(searchQuery.toLowerCase())
     )
@@ -127,7 +127,7 @@ export function UsersPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                                {filteredUsers.map((user) => (
+                                {filteredUsers.map((user: UserType) => (
                                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-4 py-3">
                                             <Link
@@ -148,8 +148,8 @@ export function UsersPage() {
                                         <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">
                                             <span
                                                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${user.is_active
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-gray-100 text-gray-800'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-gray-100 text-gray-800'
                                                     }`}
                                             >
                                                 {user.is_active ? 'Aktiv' : 'Inaktiv'}

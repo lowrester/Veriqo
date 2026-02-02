@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/api/client'
-import type { UpdateUserData, UserRole } from '@/types'
+import type { UpdateUserData, UserRole, User } from '@/types'
 import { formatDate } from '@/types'
 import { ArrowLeft, Edit2, Save, X, Loader2, AlertCircle } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
@@ -31,7 +31,7 @@ export function UserDetailPage() {
     const [isEditing, setIsEditing] = useState(false)
     const [formData, setFormData] = useState<UpdateUserData>({})
 
-    const { data: user, isLoading } = useQuery({
+    const { data: user, isLoading } = useQuery<User>({
         queryKey: ['user', id],
         queryFn: () => api.getUser(id!),
         enabled: !!id,

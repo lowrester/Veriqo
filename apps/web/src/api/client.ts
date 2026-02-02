@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/authStore'
+import type { User, CreateUserData, UpdateUserData } from '@/types'
 
 const API_BASE = '/api/v1'
 
@@ -113,6 +114,35 @@ export const api = {
     }
 
     return response.json()
+  },
+
+  // Users
+  getUsers: async (): Promise<User[]> => {
+    return request<User[]>('/users')
+  },
+
+  createUser: async (data: CreateUserData): Promise<User> => {
+    return request<User>('/users', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  getUser: async (id: string): Promise<User> => {
+    return request<User>(`/users/${id}`)
+  },
+
+  updateUser: async (id: string, data: UpdateUserData): Promise<User> => {
+    return request<User>(`/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  },
+
+  deleteUser: async (id: string): Promise<void> => {
+    return request<void>(`/users/${id}`, {
+      method: 'DELETE',
+    })
   },
 }
 
