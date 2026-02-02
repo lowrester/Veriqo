@@ -1,0 +1,19 @@
+[Unit]
+Description=Veriqo API Server
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=exec
+User=veriqo
+Group=veriqo
+WorkingDirectory=/opt/veriqo/app/apps/api
+Environment=PATH=/opt/veriqo/app/apps/api/venv/bin:/usr/bin
+ExecStart=/opt/veriqo/app/apps/api/venv/bin/uvicorn veriqo.main:app --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=5
+StandardOutput=append:/opt/veriqo/logs/api.log
+StandardError=append:/opt/veriqo/logs/api-error.log
+
+[Install]
+WantedBy=multi-user.target
