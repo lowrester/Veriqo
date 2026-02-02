@@ -23,7 +23,13 @@ BRANCH="main"
 if [ "$EUID" -ne 0 ]; then 
     echo "❌ Please run as root (use sudo)"
     exit 1
+    exit 1
 fi
+
+echo -e "${BLUE}🔧 Checking system dependencies...${NC}"
+# Install required system packages
+apt-get update
+apt-get install -y python3-venv python3-pip
 
 # Navigate to app directory
 cd "$APP_DIR" || exit 1
