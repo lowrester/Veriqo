@@ -1,5 +1,7 @@
 """Station database models."""
 
+from __future__ import annotations
+
 from sqlalchemy import Boolean, String
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship

@@ -1,5 +1,7 @@
 """User database models."""
 
+from __future__ import annotations
+
 from enum import Enum
 
 from sqlalchemy import Boolean, String
