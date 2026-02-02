@@ -17,7 +17,7 @@ APP_DIR="/opt/veriqo/app"
 WEB_DIR="$APP_DIR/apps/web"
 API_DIR="$APP_DIR/apps/api"
 VERIQO_USER="veriqo"
-BRANCH="platform-v2"
+BRANCH="main"
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then 
