@@ -58,9 +58,10 @@ sudo -u "$VERIQO_USER" npm run build
 echo -e "${BLUE}🐍 Installing backend dependencies...${NC}"
 cd "$API_DIR" || exit 1
 
-# Ensure venv exists
-if [ ! -d ".venv" ]; then
+# Ensure venv exists and is valid
+if [ ! -f ".venv/bin/pip" ]; then
     echo "Creating virtual environment..."
+    rm -rf .venv
     sudo -u "$VERIQO_USER" python3 -m venv .venv
 fi
 
