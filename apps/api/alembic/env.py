@@ -8,6 +8,12 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+import sys
+import os
+
+# Add src directory to path so we can import veriqo package
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+
 from veriqo.config import get_settings
 
 # Import all models to ensure they are registered with Base
