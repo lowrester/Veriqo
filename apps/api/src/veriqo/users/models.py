@@ -10,7 +10,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from veriqo.jobs.models import JobStatus
 
-# ... imports ...
+from veriqo.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
+from veriqo.enums import UserRole
+
 
 class User(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     # ... existing columns ...
