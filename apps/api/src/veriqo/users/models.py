@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from sqlalchemy import Boolean, String
+from sqlalchemy import Boolean, String, Integer
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
