@@ -12,6 +12,7 @@ import {
 import { useState } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 import { NAV_ITEMS, filterNavItems } from '@/lib/navModel'
+import { ThemeSwitcher } from '@/features/theme/ThemeSwitcher'
 
 const ICON_MAP = {
     LayoutDashboard,
@@ -124,13 +125,14 @@ export function AppShell() {
                         >
                             <Menu className="w-6 h-6" />
                         </button>
-                        import {ThemeSwitcher} from '@/features/theme/ThemeSwitcher'
+                        <button
 
-                        // ... existing imports ...
 
-                        // ... inside AppShell ...
+                            // ... existing imports ...
 
-                        <div className="flex-1" />
+                            // ... inside AppShell ...
+
+                            <div className="flex-1" />
                         <div className="flex items-center gap-4">
                             <ThemeSwitcher />
                         </div>
