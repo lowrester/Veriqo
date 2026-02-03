@@ -11,6 +11,7 @@ class JobCreate(BaseModel):
 
     device_id: Optional[str] = None
     serial_number: str = Field(..., min_length=1, max_length=100)
+    imei: Optional[str] = Field(None, min_length=1, max_length=100)
     customer_reference: Optional[str] = None
     batch_id: Optional[str] = None
     intake_condition: Optional[dict] = None
@@ -20,6 +21,8 @@ class JobUpdate(BaseModel):
     """Schema for updating a job."""
 
     serial_number: Optional[str] = Field(None, min_length=1, max_length=100)
+    imei: Optional[str] = Field(None, min_length=1, max_length=100)
+    imei: Optional[str] = Field(None, min_length=1, max_length=100)
     customer_reference: Optional[str] = None
     batch_id: Optional[str] = None
     intake_condition: Optional[dict] = None

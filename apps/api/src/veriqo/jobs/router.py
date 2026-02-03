@@ -31,6 +31,7 @@ def _job_to_response(job) -> JobResponse:
     return JobResponse(
         id=job.id,
         serial_number=job.serial_number,
+        imei=job.imei,
         status=job.status.value,
         device={
             "id": job.device.id,

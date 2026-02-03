@@ -1,13 +1,16 @@
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, CheckCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Printer } from 'lucide-react'
 import { api } from '@/api/client'
 import { StepCard } from './components/StepCard'
+import { PrintLabelModal } from '../printing/components/PrintLabelModal'
+import { useState } from 'react'
 
 // Define types for Job and Step (mock)
 interface Job {
     id: string
     serial_number: string
+    imei?: string
     device_platform: string
     device_model: string
 }
@@ -27,6 +30,7 @@ interface Step {
 export function RunnerPage() {
     const { id: jobId } = useParams<{ id: string }>()
     const queryClient = useQueryClient()
+    const [showPrintModal, setShowPrintModal] = useState(false)
 
     // Fetch job details
     const { data: job, isLoading: jobLoading } = useQuery<Job>({
@@ -82,12 +86,22 @@ export function RunnerPage() {
                     <div className="flex items-center gap-2">
                         <span className="badge-blue text-xs uppercase tracking-wider">Runner</span>
                         <span className="text-gray-400">/</span>
-                        <span className="font-mono text-gray-600 font-medium">{job.serial_number}</span>
+                        <span className="font-mono text-gray-600 font-medium">
+                            {job.serial_number}
+                            {job.imei && <span className="text-gray-400 ml-2 text-sm">/ {job.imei}</span>}
+                        </span>
                     </div>
                     <h1 className="text-2xl font-bold text-gray-900 mt-1">
                         {job.device_platform} {job.device_model}
                     </h1>
                 </div>
+                <button
+                    onClick={() => setShowPrintModal(true)}
+                    className="btn-secondary flex items-center gap-2 mr-2"
+                >
+                    <Printer className="w-4 h-4" />
+                    Print Label
+                </button>
                 <button className="btn-primary flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
                     Complete Job
@@ -136,6 +150,20 @@ export function RunnerPage() {
                     ))
                 )}
             </div>
+
+            {job && (
+                <PrintLabelModal
+                    isOpen={showPrintModal}
+                    onClose={() => setShowPrintModal(false)}
+                    context={{
+                        id: job.id,
+                        serial_number: job.serial_number,
+                        imei: job.imei,
+                        platform: job.device_platform,
+                        model: job.device_model
+                    }}
+                />
+            )}
         </div>
     )
 }

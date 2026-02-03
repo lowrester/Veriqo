@@ -34,7 +34,7 @@ export const NAV_ITEMS: NavItem[] = [
         roles: ['admin', 'supervisor', 'technician', 'viewer'],
     },
     {
-        label: 'Workflow Stats',
+        label: 'Live Floor',
         path: '/ops',
         icon: 'BarChart3',
         roles: ['admin', 'supervisor'],

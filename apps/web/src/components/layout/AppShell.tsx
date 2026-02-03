@@ -103,6 +103,9 @@ export function AppShell() {
                                 <p className="text-xs text-gray-400 capitalize">{user.role}</p>
                             </div>
                         </div>
+                        <div className="text-[10px] text-gray-300 mb-2 pl-1 font-mono">
+                            Veriqo Platform v2.1.0
+                        </div>
                         <button
                             onClick={handleLogout}
                             className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"

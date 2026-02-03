@@ -12,7 +12,7 @@ import { QcPage } from '@/features/qc/QcPage'
 import { ReportsPage } from '@/features/reports/ReportsPage'
 import { IntakeNewPage } from '@/features/intake/IntakeNewPage'
 import { SearchPage } from '@/features/search/SearchPage'
-import { OpsPage } from '@/features/ops/OpsPage'
+import { LiveFloorPage } from '@/features/floor/LiveFloorPage'
 import { UsersPage } from '@/features/users/UsersPage'
 import { NewUserPage } from '@/features/users/NewUserPage'
 import { UserDetailPage } from '@/features/users/UserDetailPage'
@@ -95,7 +95,7 @@ function App() {
             path="ops"
             element={
               <RequireRole anyOf={['admin', 'supervisor']}>
-                <OpsPage />
+                <LiveFloorPage />
               </RequireRole>
             }
           />

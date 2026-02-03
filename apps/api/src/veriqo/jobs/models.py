@@ -45,6 +45,7 @@ class Job(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
         nullable=True,
     )
     serial_number: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    imei: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
 
     # Workflow state
     status: Mapped[JobStatus] = mapped_column(

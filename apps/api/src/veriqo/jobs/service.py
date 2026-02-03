@@ -80,6 +80,7 @@ class JobRepository:
             id=str(uuid4()),
             device_id=data.device_id,
             serial_number=data.serial_number,
+            imei=data.imei,
             customer_reference=data.customer_reference,
             batch_id=data.batch_id,
             intake_condition=data.intake_condition,

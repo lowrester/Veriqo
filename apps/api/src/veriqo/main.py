@@ -60,6 +60,7 @@ def create_app() -> FastAPI:
     from veriqo.templates.router import router as templates_router
     from veriqo.stations.router import router as stations_router
     from veriqo.printing.router import router as printing_router
+    from veriqo.stats.router import router as stats_router
 
     # API v1 routes
     app.include_router(auth_router, prefix="/api/v1")
@@ -72,6 +73,7 @@ def create_app() -> FastAPI:
     app.include_router(templates_router, prefix="/api/v1")
     app.include_router(stations_router, prefix="/api/v1")
     app.include_router(printing_router, prefix="/api/v1")
+    app.include_router(stats_router, prefix="/api/v1")
 
     # Public routes (no /api/v1 prefix)
     app.include_router(public_router)

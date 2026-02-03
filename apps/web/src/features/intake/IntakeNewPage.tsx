@@ -4,28 +4,46 @@ import { useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import { ArrowLeft, Save } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { PrintLabelModal } from '../printing/components/PrintLabelModal'
 
 export function IntakeNewPage() {
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
         serial_number: '',
+        imei: '',
         platform: '',
         model: '',
         customer_reference: '',
         batch_id: '',
         condition_notes: '',
     })
+    const [showPrintModal, setShowPrintModal] = useState(false)
+    const [createdJob, setCreatedJob] = useState<any>(null)
+    const [submitAction, setSubmitAction] = useState<'create' | 'create_print'>('create')
 
     const createMutation = useMutation({
         mutationFn: (data: typeof formData) => api.post('/jobs', data),
         onSuccess: (job: any) => {
-            navigate(`/job/${job.id}/run`)
+            if (submitAction === 'create_print') {
+                setCreatedJob(job)
+                setShowPrintModal(true)
+            } else {
+                navigate(`/job/${job.id}/run`)
+            }
         },
     })
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (action: 'create' | 'create_print') => (e: React.MouseEvent) => {
         e.preventDefault()
+        setSubmitAction(action)
         createMutation.mutate(formData)
+    }
+
+    const handlePrintClose = () => {
+        setShowPrintModal(false)
+        if (createdJob) {
+            navigate(`/job/${createdJob.id}/run`)
+        }
     }
 
     return (
@@ -35,12 +53,12 @@ export function IntakeNewPage() {
                     <ArrowLeft className="w-4 h-4" />
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">New Job Intake</h1>
-                    <p className="text-gray-500 mt-1">Register device and start verification</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">New Job Intake</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">Register device and start verification</p>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="card space-y-4">
+            <form className="card space-y-4">
                 <div>
                     <label className="label">Serial Number *</label>
                     <input
@@ -52,6 +70,19 @@ export function IntakeNewPage() {
                         }
                         className="input"
                         placeholder="e.g. ABC123456"
+                    />
+                </div>
+
+                <div>
+                    <label className="label">IMEI (Mobile/Tablet)</label>
+                    <input
+                        type="text"
+                        value={formData.imei}
+                        onChange={(e) =>
+                            setFormData({ ...formData, imei: e.target.value })
+                        }
+                        className="input"
+                        placeholder="e.g. 3548..."
                     />
                 </div>
 
@@ -70,6 +101,8 @@ export function IntakeNewPage() {
                             <option value="playstation">PlayStation</option>
                             <option value="xbox">Xbox</option>
                             <option value="nintendo">Nintendo</option>
+                            <option value="mobile">Mobile Phone</option>
+                            <option value="tablet">Tablet</option>
                         </select>
                     </div>
 
@@ -127,14 +160,26 @@ export function IntakeNewPage() {
 
                 <div className="flex gap-3 pt-4">
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={handleSubmit('create')}
                         disabled={createMutation.isPending}
                         className="btn-primary flex items-center gap-2"
                     >
                         <Save className="w-4 h-4" />
-                        {createMutation.isPending ? 'Creating...' : 'Create Job'}
+                        {createMutation.isPending && submitAction === 'create' ? 'Creating...' : 'Create Job'}
                     </button>
-                    <Link to="/dashboard" className="btn-secondary">
+
+                    <button
+                        type="button"
+                        onClick={handleSubmit('create_print')}
+                        disabled={createMutation.isPending}
+                        className="btn-secondary flex items-center gap-2 border-brand-primary text-brand-primary hover:bg-brand-light"
+                    >
+                        <Save className="w-4 h-4" />
+                        Create & Print Label
+                    </button>
+
+                    <Link to="/dashboard" className="btn-secondary ml-auto">
                         Cancel
                     </Link>
                 </div>
@@ -145,6 +190,20 @@ export function IntakeNewPage() {
                     </div>
                 )}
             </form>
+
+            {createdJob && (
+                <PrintLabelModal
+                    isOpen={showPrintModal}
+                    onClose={handlePrintClose}
+                    context={{
+                        id: createdJob.id,
+                        serial_number: createdJob.serial_number,
+                        imei: createdJob.imei || formData.imei,
+                        platform: createdJob.device?.platform || formData.platform,
+                        model: createdJob.device?.model || formData.model
+                    }}
+                />
+            )}
         </div>
     )
 }
