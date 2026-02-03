@@ -269,6 +269,22 @@ class JobService:
 
         if result.success:
             job = await self.repo.update_status(job_id, target, user_id, notes)
+            
+            # Send completion email if job is completed
+            if target == JobStatus.COMPLETED:
+                from veriqo.integrations.email import email_service
+                # In real app, we would load the customer email from the User object
+                # For MVP we default to a placeholder if not set
+                customer_email = "customer@example.com"
+                customer_name = "Valued Customer"
+                
+                # Fire and forget (bg task in production)
+                await email_service.send_completion_email(
+                    recipient_email=customer_email,
+                    recipient_name=customer_name,
+                    job_id=job.id,
+                    serial_number=job.serial_number
+                )
 
         return job, result
 

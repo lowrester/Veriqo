@@ -102,7 +102,7 @@ export function TemplatesPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Sidebar: Device Selection */}
                 <div className="card p-0 overflow-hidden h-fit">
-                    <div className="bg-gray-50 p-4 border-b border-gray-200">
+                    <div className="bg-bg-secondary p-4 border-b border-border">
                         <h2 className="font-semibold text-gray-900">Devices</h2>
                     </div>
                     <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
@@ -110,7 +110,7 @@ export function TemplatesPage() {
                             <button
                                 key={device.id}
                                 onClick={() => setSelectedDeviceId(device.id)}
-                                className={`w-full text-left px-4 py-3 text-sm flex items-center justify-between hover:bg-gray-50 transition-colors ${selectedDeviceId === device.id ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+                                className={`w-full text-left px-4 py-3 text-sm flex items-center justify-between hover:bg-bg-secondary transition-colors ${selectedDeviceId === device.id ? 'bg-blue-50 text-blue-700 font-medium dark:bg-blue-900/20 dark:text-blue-400' : 'text-text-secondary'
                                     }`}
                             >
                                 <span>{device.platform} {device.model}</span>
@@ -138,8 +138,8 @@ export function TemplatesPage() {
                                     setFormData(prev => ({ ...prev, station_type: type.value }))
                                 }}
                                 className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${selectedStation === type.value
-                                        ? 'border-blue-600 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-blue-600 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 {type.label}
@@ -249,7 +249,7 @@ export function TemplatesPage() {
                                 {isLoading ? (
                                     <div className="text-center py-8 text-gray-500">Loading templates...</div>
                                 ) : templates.length === 0 ? (
-                                    <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                                    <div className="text-center py-12 bg-bg-secondary rounded-lg border border-dashed border-border">
                                         <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                                         <p className="text-gray-500">No steps defined for this station.</p>
                                     </div>
@@ -257,7 +257,7 @@ export function TemplatesPage() {
                                     templates.map((step) => (
                                         <div
                                             key={step.id}
-                                            className="flex items-center p-4 bg-white rounded-lg border border-gray-200 shadow-sm group hover:border-gray-300 transition-all"
+                                            className="flex items-center p-4 bg-bg-primary rounded-lg border border-border shadow-sm group hover:border-gray-400 dark:hover:border-gray-600 transition-all"
                                         >
                                             <div className="text-gray-400 mr-4 cursor-grab active:cursor-grabbing">
                                                 <GripVertical className="w-5 h-5" />

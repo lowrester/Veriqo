@@ -12,6 +12,7 @@ const ROLES: { value: UserRole; label: string }[] = [
     { value: 'supervisor', label: 'Supervisor' },
     { value: 'technician', label: 'Technician' },
     { value: 'viewer', label: 'Viewer' },
+    { value: 'customer', label: 'Customer' },
 ]
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -19,6 +20,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
     supervisor: 'Supervisor',
     technician: 'Technician',
     viewer: 'Viewer',
+    customer: 'Customer',
 }
 
 export function UserDetailPage() {

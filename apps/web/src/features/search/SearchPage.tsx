@@ -24,8 +24,8 @@ export function SearchPage() {
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Search Jobs</h1>
-                <p className="text-gray-500 mt-1">
+                <h1 className="text-2xl font-bold text-text-primary">Search Jobs</h1>
+                <p className="text-text-secondary mt-1">
                     Search by serial number, batch ID or customer reference
                 </p>
             </div>
@@ -33,7 +33,7 @@ export function SearchPage() {
             {/* Search input */}
             <div className="card">
                 <div className="relative">
-                    <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" />
                     <input
                         type="text"
                         value={searchTerm}
@@ -60,7 +60,7 @@ export function SearchPage() {
 
             {!isLoading && results.length > 0 && (
                 <div className="card">
-                    <h2 className="font-semibold text-gray-900 mb-4">
+                    <h2 className="font-semibold text-text-primary mb-4">
                         {results.length} results
                     </h2>
                     <div className="space-y-2">
@@ -68,11 +68,11 @@ export function SearchPage() {
                             <Link
                                 key={job.id}
                                 to={`/job/${job.id}/run`}
-                                className="flex items-center justify-between p-3 -mx-3 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="flex items-center justify-between p-3 -mx-3 rounded-lg hover:bg-bg-secondary transition-colors"
                             >
                                 <div>
-                                    <p className="font-medium text-gray-900">{job.serial_number}</p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="font-medium text-text-primary">{job.serial_number}</p>
+                                    <p className="text-sm text-text-secondary">
                                         {job.device_platform} {job.device_model}
                                     </p>
                                 </div>

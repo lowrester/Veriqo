@@ -25,10 +25,10 @@ export function StepCard({ step, onResult, onUploadEvidence, evidence }: StepCar
     const [notes, setNotes] = useState(step.notes || '')
 
     const statusColors = {
-        pass: 'bg-green-100 border-green-200',
-        fail: 'bg-red-100 border-red-200',
-        skip: 'bg-gray-100 border-gray-200',
-        pending: 'bg-white border-gray-200',
+        pass: 'bg-green-50 border-green-200 dark:bg-green-900/10 dark:border-green-900/30',
+        fail: 'bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-900/30',
+        skip: 'bg-gray-50 border-border dark:bg-gray-800/50',
+        pending: 'bg-bg-primary border-border',
     }
 
     return (
@@ -47,7 +47,7 @@ export function StepCard({ step, onResult, onUploadEvidence, evidence }: StepCar
                                 <span className="font-bold">{step.name.charAt(0)}</span>}
                     </div>
                     <div>
-                        <h3 className="font-semibold text-gray-900">{step.name}</h3>
+                        <h3 className="font-semibold text-text-primary">{step.name}</h3>
                         {step.is_mandatory && <span className="text-xs text-red-600 font-medium">Obligatorisk</span>}
                     </div>
                 </div>
@@ -60,14 +60,14 @@ export function StepCard({ step, onResult, onUploadEvidence, evidence }: StepCar
             {expanded && (
                 <div className="mt-4 space-y-4 border-t border-gray-200/50 pt-4">
                     {step.description && (
-                        <p className="text-gray-600 text-sm">{step.description}</p>
+                        <p className="text-text-secondary text-sm">{step.description}</p>
                     )}
 
                     {step.requires_evidence && (
-                        <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                        <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 dark:bg-blue-900/20 dark:border-blue-900/30">
                             <div className="flex items-center gap-2 text-blue-800 mb-2">
                                 <AlertCircle className="w-4 h-4" />
-                                <span className="text-sm font-medium">Bevis krävs för detta steg</span>
+                                <span className="text-sm font-medium text-blue-800 dark:text-blue-300">Bevis krävs för detta steg</span>
                             </div>
                             <EvidenceUploader onUpload={onUploadEvidence} />
                             <div className="mt-3">
@@ -91,7 +91,7 @@ export function StepCard({ step, onResult, onUploadEvidence, evidence }: StepCar
                                 onClick={() => onResult('pass', notes)}
                                 className={`btn flex items-center gap-2 justify-center ${step.status === 'pass'
                                     ? 'bg-green-600 text-white hover:bg-green-700'
-                                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-green-50 hover:text-green-700 hover:border-green-200'
+                                    : 'bg-bg-primary border border-border text-text-secondary hover:bg-green-50 hover:text-green-700 hover:border-green-200 dark:hover:bg-green-900/20 dark:hover:text-green-400'
                                     }`}
                             >
                                 <Check className="w-4 h-4" />
@@ -101,7 +101,7 @@ export function StepCard({ step, onResult, onUploadEvidence, evidence }: StepCar
                                 onClick={() => onResult('fail', notes)}
                                 className={`btn flex items-center gap-2 justify-center ${step.status === 'fail'
                                     ? 'bg-red-600 text-white hover:bg-red-700'
-                                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-red-50 hover:text-red-700 hover:border-red-200'
+                                    : 'bg-bg-primary border border-border text-text-secondary hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:text-red-400'
                                     }`}
                             >
                                 <X className="w-4 h-4" />

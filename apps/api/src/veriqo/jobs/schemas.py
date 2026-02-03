@@ -91,6 +91,7 @@ class JobResponse(BaseModel):
 
     customer_reference: Optional[str] = None
     batch_id: Optional[str] = None
+    sla_due_at: Optional[datetime] = None
     intake_condition: Optional[dict] = None
 
     qc_initials: Optional[str] = None
@@ -123,6 +124,7 @@ class JobListResponse(BaseModel):
     device_platform: Optional[str] = None
     device_model: Optional[str] = None
     assigned_technician_name: Optional[str] = None
+    customer_reference: Optional[str] = None
     created_at: datetime
 
     class Config:

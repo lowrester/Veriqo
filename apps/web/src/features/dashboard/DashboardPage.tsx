@@ -33,14 +33,14 @@ export function DashboardPage() {
       {/* Welcome & Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-2xl font-bold text-text-primary">
             Welcome, {user?.full_name}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">Here is your overview for today.</p>
+          <p className="text-text-secondary">Here is your overview for today.</p>
         </div>
         <button
           onClick={() => refetch()}
-          className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all ${isRefetching ? 'animate-spin' : ''}`}
+          className={`p-2 rounded-full hover:bg-bg-secondary transition-all ${isRefetching ? 'animate-spin' : ''}`}
           title="Refresh Data"
         >
           <RotateCw className="w-5 h-5 text-gray-500" />
@@ -83,7 +83,7 @@ export function DashboardPage() {
 
       {/* Quick actions */}
       <div className="card">
-        <h2 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h2>
+        <h2 className="font-semibold text-text-primary mb-4">Quick Actions</h2>
         <div className="flex flex-wrap gap-3">
           <Link to="/jobs/new" className="btn-primary flex items-center gap-2">
             <Plus className="w-4 h-4" />
@@ -99,7 +99,7 @@ export function DashboardPage() {
       {/* Recent Activity */}
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-900 dark:text-gray-100">Recent Activity</h2>
+          <h2 className="font-semibold text-text-primary">Recent Activity</h2>
           <Link
             to="/jobs"
             className="text-sm text-blue-600 hover:text-blue-700"
@@ -123,17 +123,17 @@ export function DashboardPage() {
               <Link
                 key={job.id}
                 to={`/job/${job.id}/run`}
-                className="flex items-center justify-between p-3 -mx-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="flex items-center justify-between p-3 -mx-3 rounded-lg hover:bg-bg-secondary transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full">
+                  <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full">
                     <Clock className="w-4 h-4 text-gray-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-gray-200">
+                    <p className="font-medium text-text-primary">
                       {job.serial_number}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-text-secondary">
                       {job.platform} {job.model}
                     </p>
                   </div>
@@ -168,11 +168,11 @@ function StatCard({
   color: 'blue' | 'yellow' | 'green' | 'red' | 'purple'
 }) {
   const colorClasses = {
-    blue: 'bg-blue-50 text-blue-600',
-    yellow: 'bg-yellow-50 text-yellow-600',
-    green: 'bg-green-50 text-green-600',
-    red: 'bg-red-50 text-red-600',
-    purple: 'bg-purple-50 text-purple-600',
+    blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+    yellow: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400',
+    green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400',
+    red: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
+    purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
   }
 
   return (
@@ -182,8 +182,8 @@ function StatCard({
           <Icon className="w-5 h-5" />
         </div>
         <div>
-          <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
+          <p className="text-2xl font-bold text-text-primary">{value}</p>
+          <p className="text-sm text-text-secondary">{label}</p>
         </div>
       </div>
     </div>

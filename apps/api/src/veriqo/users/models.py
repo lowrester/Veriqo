@@ -30,6 +30,7 @@ class User(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
         nullable=True,
     )
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    sla_hours: Mapped[int | None] = mapped_column(Integer, nullable=True)  # Default SLA for jobs created by this user
 
     # Relationships
     assigned_jobs = relationship("Job", back_populates="assigned_technician", foreign_keys="Job.assigned_technician_id")

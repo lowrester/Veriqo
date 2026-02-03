@@ -44,6 +44,7 @@ export interface JobListItem {
   device_platform?: string
   device_model?: string
   assigned_technician_name?: string
+  customer_reference?: string
   created_at: string
 }
 

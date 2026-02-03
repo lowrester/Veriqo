@@ -152,7 +152,7 @@ export function DeviceTypesPage() {
                     </div>
                 ) : (
                     <table className="w-full text-left text-sm">
-                        <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
+                        <thead className="bg-bg-secondary text-text-secondary font-medium border-b border-border">
                             <tr>
                                 <th className="px-6 py-4">Platform</th>
                                 <th className="px-6 py-4">Model</th>
@@ -162,7 +162,7 @@ export function DeviceTypesPage() {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredDevices.map((device) => (
-                                <tr key={device.id} className="hover:bg-gray-50 transition-colors group">
+                                <tr key={device.id} className="hover:bg-bg-secondary/50 transition-colors group">
                                     <td className="px-6 py-4 font-medium text-gray-900">{device.platform}</td>
                                     <td className="px-6 py-4">{device.model}</td>
                                     <td className="px-6 py-4 text-gray-500 font-mono text-xs">

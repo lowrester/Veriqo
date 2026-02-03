@@ -41,29 +41,29 @@ export function AppShell() {
     const visibleNavItems = filterNavItems(NAV_ITEMS, user.role as any)
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-bg-secondary text-text-primary">
             {/* Mobile sidebar backdrop */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
             {/* Sidebar */}
             <aside
-                className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed top-0 left-0 z-50 h-full w-64 bg-bg-primary border-r border-border transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
             >
                 <div className="flex flex-col h-full">
                     {/* Logo */}
-                    <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-                        <h1 className="text-xl font-bold text-gray-900">Veriqo</h1>
+                    <div className="flex items-center justify-between h-16 px-4 border-b border-border">
+                        <h1 className="text-xl font-bold text-text-primary">Veriqo</h1>
                         <button
                             onClick={() => setSidebarOpen(false)}
-                            className="lg:hidden p-2 rounded-md hover:bg-gray-100"
+                            className="lg:hidden p-2 rounded-md hover:bg-bg-secondary"
                         >
-                            <X className="w-5 h-5" />
+                            <X className="w-5 h-5 text-text-secondary" />
                         </button>
                     </div>
 
@@ -81,8 +81,8 @@ export function AppShell() {
                                     to={item.path}
                                     onClick={() => setSidebarOpen(false)}
                                     className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
-                                        ? 'bg-blue-50 text-blue-600'
-                                        : 'text-gray-700 hover:bg-gray-100'
+                                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
+                                        : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary'
                                         }`}
                                 >
                                     {Icon && <Icon className="w-5 h-5" />}
@@ -93,22 +93,22 @@ export function AppShell() {
                     </nav>
 
                     {/* User section */}
-                    <div className="p-4 border-t border-gray-200">
+                    <div className="p-4 border-t border-border">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">
+                                <p className="text-sm font-medium text-text-primary truncate">
                                     {user.full_name}
                                 </p>
-                                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                                <p className="text-xs text-text-secondary truncate">{user.email}</p>
                                 <p className="text-xs text-gray-400 capitalize">{user.role}</p>
                             </div>
                         </div>
-                        <div className="text-[10px] text-gray-300 mb-2 pl-1 font-mono">
+                        <div className="text-[10px] text-gray-400 mb-2 pl-1 font-mono">
                             Veriqo Platform v2.1.0
                         </div>
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:bg-bg-secondary hover:text-text-primary rounded-lg transition-colors"
                         >
                             <LogOut className="w-4 h-4" />
                             Logga ut
@@ -120,13 +120,13 @@ export function AppShell() {
             {/* Main content */}
             <div className="lg:pl-64">
                 {/* Top bar */}
-                <header className="sticky top-0 z-30 h-16 bg-white border-b border-gray-200">
+                <header className="sticky top-0 z-30 h-16 bg-bg-primary border-b border-border">
                     <div className="flex items-center justify-between h-full px-4">
                         <button
                             onClick={() => setSidebarOpen(true)}
-                            className="lg:hidden p-2 rounded-md hover:bg-gray-100"
+                            className="lg:hidden p-2 rounded-md hover:bg-bg-secondary"
                         >
-                            <Menu className="w-6 h-6" />
+                            <Menu className="w-6 h-6 text-text-secondary" />
                         </button>
 
                         <div className="flex-1" />

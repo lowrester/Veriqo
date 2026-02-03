@@ -24,6 +24,8 @@ import { SettingsLayout } from '@/features/settings/SettingsLayout'
 import { PrintersPage } from '@/features/settings/PrintersPage'
 import { LabelLayoutsPage } from '@/features/settings/LabelLayoutsPage'
 import { IntegrationsPage } from '@/features/settings/IntegrationsPage'
+import { FeaturesPage } from '@/features/settings/FeaturesPage'
+import { CustomerDashboard } from '@/features/portal/CustomerDashboard'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -122,7 +124,8 @@ function App() {
               </RequireRole>
             }
           >
-            <Route index element={<Navigate to="printers" />} />
+            <Route index element={<Navigate to="features" />} />
+            <Route path="features" element={<FeaturesPage />} />
             <Route path="printers" element={<PrintersPage />} />
             <Route path="labels" element={<LabelLayoutsPage />} />
             <Route path="integrations" element={<IntegrationsPage />} />
@@ -130,6 +133,15 @@ function App() {
             {/* Alias existing admin pages into settings for better UX */}
             <Route path="users" element={<UsersPage />} />
             <Route path="devices" element={<DeviceTypesPage />} />
+            {/* Client Portal */}
+            <Route
+              path="portal"
+              element={
+                <RequireRole anyOf={['customer']}>
+                  <CustomerDashboard />
+                </RequireRole>
+              }
+            />
           </Route>
         </Route>
 

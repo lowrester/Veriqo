@@ -7,7 +7,7 @@ export type JobStatus =
   | 'failed'
   | 'on_hold'
 
-export type UserRole = 'admin' | 'supervisor' | 'technician' | 'viewer'
+export type UserRole = 'admin' | 'supervisor' | 'technician' | 'viewer' | 'customer'
 
 export interface User {
   id: string

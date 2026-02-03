@@ -11,6 +11,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
     supervisor: 'Supervisor',
     technician: 'Technician',
     viewer: 'Viewer',
+    customer: 'Customer',
 }
 
 const ROLE_COLORS: Record<UserRole, string> = {
@@ -18,6 +19,7 @@ const ROLE_COLORS: Record<UserRole, string> = {
     supervisor: 'purple',
     technician: 'blue',
     viewer: 'gray',
+    customer: 'indigo',
 }
 
 export function UsersPage() {

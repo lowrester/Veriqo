@@ -98,7 +98,7 @@ export function QcPage() {
                         <h2 className="font-semibold text-gray-900 mb-4">Test Results</h2>
                         <div className="space-y-4">
                             {steps.map((step) => (
-                                <div key={step.id} className="border border-gray-100 rounded-lg p-3 bg-gray-50">
+                                <div key={step.id} className="border border-border rounded-lg p-3 bg-bg-secondary">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="font-medium text-gray-900">{step.name}</span>
                                         <span className={`px-2 py-1 rounded text-xs font-medium uppercase ${step.status === 'pass' ? 'bg-green-100 text-green-700' :

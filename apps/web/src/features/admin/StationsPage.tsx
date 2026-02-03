@@ -128,7 +128,7 @@ export function StationsPage() {
                         {stations.map((station) => (
                             <div
                                 key={station.id}
-                                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
+                                className="flex items-center justify-between p-4 bg-bg-secondary rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors group"
                             >
                                 <div className="flex items-center gap-4">
                                     <div className={`p-2 rounded-lg ${station.is_active ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-400'

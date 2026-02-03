@@ -93,6 +93,9 @@ class Job(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     batch_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     customer_reference: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
+    # SLA Tracking
+    sla_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     # Intake condition
     intake_condition: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
 

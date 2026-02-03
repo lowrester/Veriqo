@@ -27,9 +27,11 @@ export default {
           DEFAULT: 'rgb(var(--color-border) / <alpha-value>)',
         }
       },
-      // Tablet-first touch targets
       spacing: {
         'touch': '44px',
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
     },
   },

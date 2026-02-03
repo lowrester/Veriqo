@@ -101,13 +101,13 @@ export function JobDetailPage() {
         <div>
           <button
             onClick={() => navigate('/jobs')}
-            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-2"
+            className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Jobs
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">{job.serial_number}</h1>
-          <p className="text-gray-500">
+          <h1 className="text-2xl font-bold text-text-primary">{job.serial_number}</h1>
+          <p className="text-text-secondary">
             {job.device?.platform} {job.device?.model}
           </p>
         </div>
@@ -119,7 +119,7 @@ export function JobDetailPage() {
       {/* Workflow actions */}
       {validTransitions.length > 0 && (
         <div className="card">
-          <h2 className="font-semibold text-gray-900 mb-4">Workflow Actions</h2>
+          <h2 className="font-semibold text-text-primary mb-4">Workflow Actions</h2>
           <div className="flex flex-wrap gap-3">
             {validTransitions.map((status) => (
               <button
@@ -148,7 +148,7 @@ export function JobDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Job details */}
         <div className="card">
-          <h2 className="font-semibold text-gray-900 mb-4">Job Details</h2>
+          <h2 className="font-semibold text-text-primary mb-4">Job Details</h2>
           <dl className="space-y-3">
             <DetailRow label="Serial Number" value={job.serial_number} />
             <DetailRow label="Platform" value={job.device?.platform || '-'} />
@@ -166,7 +166,7 @@ export function JobDetailPage() {
         {/* Evidence */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-gray-900">Evidence</h2>
+            <h2 className="font-semibold text-text-primary">Evidence</h2>
             <label className="btn-secondary flex items-center gap-2 cursor-pointer">
               {isUploading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -198,15 +198,15 @@ export function JobDetailPage() {
                   href={evidenceApi.getDownloadUrl(item.id)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block p-3 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
+                  className="block p-3 border border-border rounded-lg hover:border-blue-300 transition-colors"
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <FileText className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-900 truncate">
+                    <FileText className="w-4 h-4 text-text-secondary" />
+                    <span className="text-sm font-medium text-text-primary truncate">
                       {item.original_filename}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-text-secondary">
                     {formatBytes(item.file_size_bytes)} • {formatDate(item.captured_at)}
                   </p>
                 </a>
@@ -218,17 +218,17 @@ export function JobDetailPage() {
 
       {/* History */}
       <div className="card">
-        <h2 className="font-semibold text-gray-900 mb-4">History</h2>
+        <h2 className="font-semibold text-text-primary mb-4">History</h2>
         {history.length === 0 ? (
-          <p className="text-gray-500">No history available</p>
+          <p className="text-text-secondary">No history available</p>
         ) : (
           <div className="space-y-3">
             {history.map((entry) => (
               <div
                 key={entry.id}
-                className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
+                className="flex items-start gap-3 p-3 bg-bg-secondary rounded-lg"
               >
-                <Clock className="w-4 h-4 text-gray-400 mt-0.5" />
+                <Clock className="w-4 h-4 text-text-secondary mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-900">
                     {entry.from_status ? (
@@ -244,9 +244,9 @@ export function JobDetailPage() {
                     </span>
                   </p>
                   {entry.notes && (
-                    <p className="text-sm text-gray-500 mt-1">{entry.notes}</p>
+                    <p className="text-sm text-text-secondary mt-1">{entry.notes}</p>
                   )}
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-text-secondary mt-1">
                     {entry.changed_by_name} • {formatDate(entry.changed_at)}
                   </p>
                 </div>
@@ -262,8 +262,8 @@ export function JobDetailPage() {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between">
-      <dt className="text-sm text-gray-500">{label}</dt>
-      <dd className="text-sm font-medium text-gray-900">{value}</dd>
+      <dt className="text-sm text-text-secondary">{label}</dt>
+      <dd className="text-sm font-medium text-text-primary">{value}</dd>
     </div>
   )
 }
