@@ -23,6 +23,7 @@ import { DeviceTypesPage } from '@/features/admin/DeviceTypesPage'
 import { SettingsLayout } from '@/features/settings/SettingsLayout'
 import { PrintersPage } from '@/features/settings/PrintersPage'
 import { LabelLayoutsPage } from '@/features/settings/LabelLayoutsPage'
+import { IntegrationsPage } from '@/features/settings/IntegrationsPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -124,6 +125,7 @@ function App() {
             <Route index element={<Navigate to="printers" />} />
             <Route path="printers" element={<PrintersPage />} />
             <Route path="labels" element={<LabelLayoutsPage />} />
+            <Route path="integrations" element={<IntegrationsPage />} />
 
             {/* Alias existing admin pages into settings for better UX */}
             <Route path="users" element={<UsersPage />} />
