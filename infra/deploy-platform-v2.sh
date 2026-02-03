@@ -23,7 +23,7 @@ BRANCH="main"
 if [ "$EUID" -ne 0 ]; then 
     echo "❌ Please run as root (use sudo)"
     exit 1
-    exit 1
+
 fi
 
 echo -e "${BLUE}🔧 Checking system dependencies...${NC}"
