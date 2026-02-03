@@ -2,9 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --brand-primary: #2563eb;
-  --brand-secondary: #1e40af;
+@layer base {
+  :root {
+    /* Base Colors - Slate 50-900 */
+    --color-bg-primary: 255 255 255;
+    --color-bg-secondary: 248 250 252;
+    --color-text-primary: 15 23 42;
+    --color-text-secondary: 100 116 139;
+    --color-border: 226 232 240;
+
+    /* Default Brand - Blue */
+    --brand-primary: 37 99 235;
+    --brand-secondary: 30 64 175;
+    --brand-light: 219 234 254;
+  }
+
+  /* Dark Mode Overrides */
+  .dark {
+    --color-bg-primary: 15 23 42;
+    --color-bg-secondary: 30 41 59;
+    --color-text-primary: 248 250 252;
+    --color-text-secondary: 148 163 184;
+    --color-border: 51 65 85;
+  }
+
+  /* Color Schemes */
+  body[data-color-scheme='purple'] {
+    --brand-primary: 147 51 234;
+    --brand-secondary: 107 33 168;
+    --brand-light: 243 232 255;
+  }
+
+  body[data-color-scheme='green'] {
+    --brand-primary: 22 163 74;
+    --brand-secondary: 21 128 61;
+    --brand-light: 220 252 231;
+  }
+
+  body[data-color-scheme='orange'] {
+    --brand-primary: 234 88 12;
+    --brand-secondary: 194 65 12;
+    --brand-light: 255 237 213;
+  }
 }
 
 body {

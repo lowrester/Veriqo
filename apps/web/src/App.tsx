@@ -31,84 +31,88 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+import { ThemeProvider } from '@/features/theme/ThemeContext'
+
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
+    <ThemeProvider>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
 
-      <Route
-        path="/*"
-        element={
-          <PrivateRoute>
-            <AppShell />
-          </PrivateRoute>
-        }
-      >
-        <Route index element={<Navigate to="/dashboard" />} />
-        <Route path="dashboard" element={<DashboardPage />} />
-
-        {/* Jobs */}
-        <Route path="jobs" element={<JobsPage />} />
-        <Route path="jobs/new" element={<NewJobPage />} />
-        <Route path="jobs/:id" element={<JobDetailPage />} />
-
-        {/* Workflow */}
         <Route
-          path="intake/new"
+          path="/*"
           element={
-            <RequireRole anyOf={['admin', 'supervisor', 'technician']}>
-              <IntakeNewPage />
-            </RequireRole>
+            <PrivateRoute>
+              <AppShell />
+            </PrivateRoute>
           }
-        />
-        <Route
-          path="job/:id/run"
-          element={
-            <RequireRole anyOf={['admin', 'supervisor', 'technician']}>
-              <RunnerPage />
-            </RequireRole>
-          }
-        />
-        <Route
-          path="job/:id/qc"
-          element={
-            <RequireRole anyOf={['admin', 'supervisor']}>
-              <QcPage />
-            </RequireRole>
-          }
-        />
-        <Route
-          path="job/:id/reports"
-          element={
-            <RequireRole anyOf={['admin', 'supervisor', 'technician', 'viewer']}>
-              <ReportsPage />
-            </RequireRole>
-          }
-        />
+        >
+          <Route index element={<Navigate to="/dashboard" />} />
+          <Route path="dashboard" element={<DashboardPage />} />
 
-        {/* Search & Ops */}
-        <Route path="search" element={<SearchPage />} />
-        <Route
-          path="ops"
-          element={
-            <RequireRole anyOf={['admin', 'supervisor']}>
-              <OpsPage />
-            </RequireRole>
-          }
-        />
+          {/* Jobs */}
+          <Route path="jobs" element={<JobsPage />} />
+          <Route path="jobs/new" element={<NewJobPage />} />
+          <Route path="jobs/:id" element={<JobDetailPage />} />
 
-        {/* Admin */}
-        <Route path="admin" element={<AdminPage />} />
-        <Route path="admin/stations" element={<StationsPage />} />
-        <Route path="admin/templates" element={<TemplatesPage />} />
-        <Route path="admin/devices" element={<DeviceTypesPage />} />
-        <Route path="users" element={<UsersPage />} />
-        <Route path="users/new" element={<NewUserPage />} />
-        <Route path="users/:id" element={<UserDetailPage />} />
-      </Route>
+          {/* Workflow */}
+          <Route
+            path="intake/new"
+            element={
+              <RequireRole anyOf={['admin', 'supervisor', 'technician']}>
+                <IntakeNewPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="job/:id/run"
+            element={
+              <RequireRole anyOf={['admin', 'supervisor', 'technician']}>
+                <RunnerPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="job/:id/qc"
+            element={
+              <RequireRole anyOf={['admin', 'supervisor']}>
+                <QcPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="job/:id/reports"
+            element={
+              <RequireRole anyOf={['admin', 'supervisor', 'technician', 'viewer']}>
+                <ReportsPage />
+              </RequireRole>
+            }
+          />
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+          {/* Search & Ops */}
+          <Route path="search" element={<SearchPage />} />
+          <Route
+            path="ops"
+            element={
+              <RequireRole anyOf={['admin', 'supervisor']}>
+                <OpsPage />
+              </RequireRole>
+            }
+          />
+
+          {/* Admin */}
+          <Route path="admin" element={<AdminPage />} />
+          <Route path="admin/stations" element={<StationsPage />} />
+          <Route path="admin/templates" element={<TemplatesPage />} />
+          <Route path="admin/devices" element={<DeviceTypesPage />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="users/new" element={<NewUserPage />} />
+          <Route path="users/:id" element={<UserDetailPage />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </ThemeProvider>
   )
 }
 

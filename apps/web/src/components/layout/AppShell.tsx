@@ -80,8 +80,8 @@ export function AppShell() {
                                     to={item.path}
                                     onClick={() => setSidebarOpen(false)}
                                     className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
-                                            ? 'bg-blue-50 text-blue-600'
-                                            : 'text-gray-700 hover:bg-gray-100'
+                                        ? 'bg-blue-50 text-blue-600'
+                                        : 'text-gray-700 hover:bg-gray-100'
                                         }`}
                                 >
                                     {Icon && <Icon className="w-5 h-5" />}
@@ -124,7 +124,16 @@ export function AppShell() {
                         >
                             <Menu className="w-6 h-6" />
                         </button>
+                        import {ThemeSwitcher} from '@/features/theme/ThemeSwitcher'
+
+                        // ... existing imports ...
+
+                        // ... inside AppShell ...
+
                         <div className="flex-1" />
+                        <div className="flex items-center gap-4">
+                            <ThemeSwitcher />
+                        </div>
                     </div>
                 </header>
 
