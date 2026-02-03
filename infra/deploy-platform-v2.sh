@@ -58,10 +58,9 @@ sudo -u "$VERIQO_USER" npm run build
 echo -e "${BLUE}🐍 Installing backend dependencies...${NC}"
 cd "$API_DIR" || exit 1
 
-# Ensure venv exists and is valid
-if [ ! -f ".venv/bin/pip" ]; then
+# Ensure venv exists
+if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
-    rm -rf .venv
     sudo -u "$VERIQO_USER" python3 -m venv .venv
 fi
 
@@ -69,7 +68,7 @@ fi
 sudo -u "$VERIQO_USER" "$API_DIR/.venv/bin/pip" install -r requirements.txt
 
 echo -e "${BLUE}🗄️ Running database migrations...${NC}"
-sudo -u "$VERIQO_USER" "$API_DIR/.venv/bin/alembic" upgrade head
+sudo -u "$VERIQO_USER" PYTHONPATH="$API_DIR/src" "$API_DIR/.venv/bin/alembic" upgrade head
 
 echo -e "${BLUE}🔄 Restarting services...${NC}"
 systemctl restart veriqo-api
