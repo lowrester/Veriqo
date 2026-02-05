@@ -40,7 +40,7 @@ export function LoginPage() {
         <div className="card">
           <div className="text-center mb-8 flex flex-col items-center">
             <img src={logo} alt="Veriqko" className="h-12 w-auto mb-2" />
-            <p className="text-gray-500 mt-1">Console Verification Platform</p>
+            <h1 className="text-2xl font-bold">Veriqko</h1>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
