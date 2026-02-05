@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, JSON
 from veriqko.db.base import Base
-from veriqko.db.mixins import UUIDMixin, TimestampMixin
+from veriqko.db.base import UUIDMixin, TimestampMixin
 
 class SystemSetting(Base, UUIDMixin, TimestampMixin):
     """Global system settings stored as key-value pairs."""
