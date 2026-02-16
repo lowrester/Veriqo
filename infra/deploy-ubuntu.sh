@@ -82,7 +82,8 @@ apt-get install -y \
     gnupg \
     lsb-release \
     openssh-client \
-    ssh-askpass
+    ssh-askpass \
+    qemu-guest-agent
 
 #===============================================================================
 # SSH Key Setup

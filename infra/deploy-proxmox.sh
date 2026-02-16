@@ -110,6 +110,7 @@ packages:
   - git
   - curl
   - htop
+  - qemu-guest-agent
 
 write_files:
   - path: /opt/veriqko/deploy.sh
