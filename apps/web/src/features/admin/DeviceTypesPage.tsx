@@ -3,13 +3,26 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Trash2, Save, X, Search } from 'lucide-react'
 import { api } from '@/api/client'
 
+interface Brand {
+    id: string
+    name: string
+    logo_url?: string
+}
+
+interface GadgetType {
+    id: string
+    name: string
+}
+
 interface Device {
     id: string
-    brand: string
-    device_type: string
+    brand_id: string
+    type_id: string
     model: string
     model_number?: string
     test_config: Record<string, any>
+    brand: Brand
+    gadget_type: GadgetType
 }
 
 export function DeviceTypesPage() {
@@ -17,10 +30,22 @@ export function DeviceTypesPage() {
     const [isCreating, setIsCreating] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [formData, setFormData] = useState({
-        brand: '',
-        device_type: '',
+        brand_id: '',
+        type_id: '',
         model: '',
         model_number: '',
+    })
+
+    // Fetch brands
+    const { data: brands = [] } = useQuery<Brand[]>({
+        queryKey: ['brands'],
+        queryFn: () => api.get('/admin/brands'),
+    })
+
+    // Fetch gadget types
+    const { data: gadgetTypes = [] } = useQuery<GadgetType[]>({
+        queryKey: ['gadget-types'],
+        queryFn: () => api.get('/admin/gadget-types'),
     })
 
     // Fetch devices
@@ -35,7 +60,7 @@ export function DeviceTypesPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['devices'] })
             setIsCreating(false)
-            setFormData({ brand: '', device_type: '', model: '', model_number: '' })
+            setFormData({ brand_id: '', type_id: '', model: '', model_number: '' })
         },
     })
 
@@ -53,8 +78,8 @@ export function DeviceTypesPage() {
     }
 
     const filteredDevices = devices.filter(d =>
-        d.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        d.device_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.gadget_type.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         d.model.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
@@ -63,7 +88,7 @@ export function DeviceTypesPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Device Types</h1>
-                    <p className="text-gray-500 mt-1">Manage platforms and models</p>
+                    <p className="text-gray-500 mt-1">Manage brands, platforms and models</p>
                 </div>
                 <button
                     onClick={() => setIsCreating(true)}
@@ -78,50 +103,60 @@ export function DeviceTypesPage() {
                 <div className="card border-2 border-orange-100 animate-in slide-in-from-top-2">
                     <h2 className="font-semibold text-gray-900 mb-4">Add New Device Type</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="label">Brand</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.brand}
-                                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                                className="input"
-                                placeholder="e.g. Apple"
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="label">Brand</label>
+                                <select
+                                    required
+                                    value={formData.brand_id}
+                                    onChange={(e) => setFormData({ ...formData, brand_id: e.target.value })}
+                                    className="input"
+                                >
+                                    <option value="">Select Brand</option>
+                                    {brands.map(b => (
+                                        <option key={b.id} value={b.id}>{b.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="label">Device Type</label>
+                                <select
+                                    required
+                                    value={formData.type_id}
+                                    onChange={(e) => setFormData({ ...formData, type_id: e.target.value })}
+                                    className="input"
+                                >
+                                    <option value="">Select Type</option>
+                                    {gadgetTypes.map(t => (
+                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
-                        <div>
-                            <label className="label">Device Type</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.device_type}
-                                onChange={(e) => setFormData({ ...formData, device_type: e.target.value })}
-                                className="input"
-                                placeholder="e.g. Mobile"
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="label">Model</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={formData.model}
+                                    onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                                    className="input"
+                                    placeholder="e.g. iPhone 13"
+                                />
+                            </div>
+                            <div>
+                                <label className="label">Model Number (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={formData.model_number}
+                                    onChange={(e) => setFormData({ ...formData, model_number: e.target.value })}
+                                    className="input"
+                                    placeholder="e.g. A2633"
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <label className="label">Model</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.model}
-                                onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                                className="input"
-                                placeholder="e.g. iPhone 13"
-                            />
-                        </div>
-                        <div>
-                            <label className="label">Model Number (Optional)</label>
-                            <input
-                                type="text"
-                                value={formData.model_number}
-                                onChange={(e) => setFormData({ ...formData, model_number: e.target.value })}
-                                className="input"
-                                placeholder="e.g. A2633"
-                            />
-                        </div>
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 pt-2">
                             <button
                                 type="submit"
                                 disabled={createMutation.isPending}
@@ -148,7 +183,7 @@ export function DeviceTypesPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                     type="text"
-                    placeholder="Search platform or model..."
+                    placeholder="Search brand, type or model..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="input pl-10"
@@ -176,9 +211,15 @@ export function DeviceTypesPage() {
                         <tbody className="divide-y divide-gray-100">
                             {filteredDevices.map((device) => (
                                 <tr key={device.id} className="hover:bg-bg-secondary/50 transition-colors group">
-                                    <td className="px-6 py-4 font-medium text-gray-900">{device.brand}</td>
-                                    <td className="px-6 py-4">{device.device_type}</td>
-                                    <td className="px-6 py-4">{device.model}</td>
+                                    <td className="px-6 py-4">
+                                        <span className="font-medium text-gray-900">{device.brand.name}</span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                            {device.gadget_type.name}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 font-medium">{device.model}</td>
                                     <td className="px-6 py-4 text-gray-500 font-mono text-xs">
                                         {device.model_number || '-'}
                                     </td>

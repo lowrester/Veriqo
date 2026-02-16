@@ -31,3 +31,6 @@ pillow>=10.2.0
 # Logging & HTTP
 structlog>=24.1.0
 httpx>=0.26.0
+
+# Cloud Storage
+azure-storage-blob>=12.19.0

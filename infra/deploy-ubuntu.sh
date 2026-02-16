@@ -79,7 +79,51 @@ apt-get install -y \
     apt-transport-https \
     ca-certificates \
     gnupg \
-    lsb-release
+    gnupg \
+    lsb-release \
+    openssh-client \
+    ssh-askpass
+
+#===============================================================================
+# SSH Key Setup
+#===============================================================================
+
+log "Setting up SSH..."
+SSH_DIR="/root/.ssh"
+mkdir -p "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+
+if [ ! -f "$SSH_DIR/id_ed25519" ]; then
+    log "Generating new ED25519 SSH key..."
+    ssh-keygen -t ed25519 -C "deploy@veriqko" -f "$SSH_DIR/id_ed25519" -N ""
+fi
+
+# Ensure ssh-agent is running and key is added
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    eval "$(ssh-agent -s)"
+fi
+ssh-add "$SSH_DIR/id_ed25519"
+
+# Add ssh-agent to profile for persistence
+if ! grep -q "ssh-agent" /root/.bashrc; then
+    cat >> /root/.bashrc <<'EOF'
+
+# Start SSH Agent on login
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    eval "$(ssh-agent -s)" > /dev/null
+    ssh-add ~/.ssh/id_ed25519 2>/dev/null
+fi
+EOF
+fi
+
+echo -e "\n${YELLOW}================================================================${NC}"
+echo -e "${YELLOW}ACTION REQUIRED: ADD THIS SSH PUBLIC KEY TO GITHUB${NC}"
+echo -e "${YELLOW}================================================================${NC}\n"
+cat "$SSH_DIR/id_ed25519.pub"
+echo -e "\n${YELLOW}URL: https://github.com/settings/keys${NC}"
+echo -e "${YELLOW}Waiting 30 seconds for you to copy the key... (or press Enter to continue)${NC}\n"
+
+read -t 30 -p "Press Enter to continue deployment..." || true
 
 #===============================================================================
 # PostgreSQL

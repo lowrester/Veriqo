@@ -116,6 +116,12 @@ write_files:
     content: |
       #!/bin/bash
       # This script is generated and executed by cloud-init
+      export VERIQKO_DOMAIN="${VERIQKO_DOMAIN}"
+      export VERIQKO_DB_PASSWORD="${VERIQKO_DB_PASSWORD}"
+      export VERIQKO_JWT_SECRET="${VERIQKO_JWT_SECRET}"
+      export VERIQKO_ADMIN_EMAIL="${VERIQKO_ADMIN_EMAIL}"
+      export VERIQKO_ADMIN_PASSWORD="${VERIQKO_ADMIN_PASSWORD}"
+      
       # See deploy-ubuntu.sh for the full deployment script
       curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/claude/add-pdf-support-166IR/infra/deploy-ubuntu.sh | bash
 

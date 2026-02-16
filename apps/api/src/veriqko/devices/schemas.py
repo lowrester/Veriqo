@@ -1,8 +1,23 @@
 from pydantic import BaseModel, ConfigDict
 
+class BrandBase(BaseModel):
+    name: str
+    logo_url: str | None = None
+
+class BrandResponse(BrandBase):
+    id: str
+    model_config = ConfigDict(from_attributes=True)
+
+class GadgetTypeBase(BaseModel):
+    name: str
+
+class GadgetTypeResponse(GadgetTypeBase):
+    id: str
+    model_config = ConfigDict(from_attributes=True)
+
 class DeviceBase(BaseModel):
-    brand: str
-    device_type: str
+    brand_id: str
+    type_id: str
     model: str
     model_number: str | None = None
     test_config: dict = {}
@@ -11,15 +26,22 @@ class DeviceCreate(DeviceBase):
     pass
 
 class DeviceUpdate(BaseModel):
-    brand: str | None = None
-    device_type: str | None = None
+    brand_id: str | None = None
+    type_id: str | None = None
     model: str | None = None
     model_number: str | None = None
     test_config: dict | None = None
 
-class DeviceResponse(DeviceBase):
+class DeviceResponse(BaseModel):
     id: str
-    created_at: str | None = None # DateTime serialized
+    brand_id: str
+    type_id: str
+    model: str
+    model_number: str | None = None
+    test_config: dict = {}
+    brand: BrandResponse
+    gadget_type: GadgetTypeResponse
+    created_at: str | None = None
     updated_at: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
