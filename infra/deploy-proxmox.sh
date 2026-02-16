@@ -17,7 +17,7 @@
 set -e
 
 # Configuration - EDIT THESE VALUES
-VMID="${VMID:-200}"
+VMID="${VMID:-201}"
 VM_NAME="${VM_NAME:-veriqko}"
 VM_MEMORY="${VM_MEMORY:-4096}"
 VM_CORES="${VM_CORES:-2}"
