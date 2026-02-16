@@ -43,7 +43,7 @@ VERIQKO_USER="${VERIQKO_USER:-veriqko}"
 VERIQKO_HOME="/opt/veriqko"
 VERIQKO_DOMAIN="${VERIQKO_DOMAIN:-$(hostname -f)}"
 VERIQKO_REPO="${VERIQKO_REPO:-https://github.com/lowrester/Veriqko.git}"
-VERIQKO_BRANCH="${VERIQKO_BRANCH:-claude/add-pdf-support-166IR}"
+VERIQKO_BRANCH="${VERIQKO_BRANCH:-main}"
 
 # Database
 DB_NAME="${DB_NAME:-veriqko}"

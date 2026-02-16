@@ -30,6 +30,7 @@ UBUNTU_VERSION="jammy"  # Ubuntu 22.04 LTS
 CLOUD_IMAGE_URL="https://cloud-images.ubuntu.com/${UBUNTU_VERSION}/current/${UBUNTU_VERSION}-server-cloudimg-amd64.img"
 
 # Veriqko Configuration
+VERIQKO_BRANCH="${VERIQKO_BRANCH:-main}"
 VERIQKO_DOMAIN="${VERIQKO_DOMAIN:-veriqko.local}"
 VERIQKO_DB_PASSWORD="${VERIQKO_DB_PASSWORD:-$(openssl rand -base64 24)}"
 VERIQKO_JWT_SECRET="${VERIQKO_JWT_SECRET:-$(openssl rand -base64 48)}"
@@ -123,7 +124,7 @@ write_files:
       export VERIQKO_ADMIN_PASSWORD="${VERIQKO_ADMIN_PASSWORD}"
       
       # See deploy-ubuntu.sh for the full deployment script
-      curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/claude/add-pdf-support-166IR/infra/deploy-ubuntu.sh | bash
+      curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-ubuntu.sh | bash
 
 runcmd:
   - /opt/veriqko/deploy.sh
