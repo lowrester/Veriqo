@@ -248,7 +248,23 @@ for iface in data:
 fi
 
 if [ -z "$VM_IP" ]; then
-    error "Could not determine VM IP after 3 minutes. Check VM console in Proxmox UI.\nVM ID: $VMID"
+    warn "Could not detect VM IP automatically via QEMU guest agent."
+    warn "You can find the IP in the Proxmox web UI under VM $VMID > Summary,"
+    warn "or by checking your router's DHCP leases."
+    echo ""
+    while true; do
+        read -rp "Enter VM IP address manually (or 'q' to quit): " VM_IP
+        if [ "$VM_IP" = "q" ] || [ "$VM_IP" = "Q" ]; then
+            error "Aborted by user. VM $VMID is running — SSH in manually and run deploy-ubuntu.sh + deploy-platform-v2.sh."
+        fi
+        # Basic IP format validation
+        if [[ "$VM_IP" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            log "Using manually entered IP: $VM_IP"
+            break
+        else
+            warn "Invalid IP format. Please enter a valid IPv4 address (e.g. 192.168.1.100)"
+        fi
+    done
 fi
 
 log "VM is up at $VM_IP"
