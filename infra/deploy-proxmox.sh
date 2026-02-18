@@ -65,6 +65,11 @@ ADMIN_SSH_PUBKEY="${ADMIN_SSH_PUBKEY:-}"
 # Set via env var or leave blank to auto-generate.
 VM_CONSOLE_PASSWORD="${VM_CONSOLE_PASSWORD:-$(openssl rand -base64 16)}"
 
+# Static MAC address — keeps the same DHCP IP across VM recreations.
+# Format: BC:24:11:xx:xx:xx  (Proxmox OUI prefix recommended)
+# Leave blank to auto-generate (different IP each time).
+VM_MAC="${VM_MAC:-BC:24:11:DE:AD:01}"
+
 # Paths
 CLOUD_IMAGE_DIR="/var/lib/vz/template/iso"
 SNIPPETS_DIR="/var/lib/vz/snippets"
@@ -91,6 +96,17 @@ error()   { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 step()    { echo -e "\n${BOLD}${CYAN}━━━ $1 ━━━${NC}\n"; }
 divider() { echo -e "${YELLOW}================================================================${NC}"; }
 banner()  { echo -e "\n${BOLD}${CYAN}$1${NC}\n"; }
+
+# prompt <var_name> <prompt_text>
+# Reads from /dev/tty so it works even when script is piped via curl | bash
+prompt() {
+    local __var=$1
+    local __msg=$2
+    local __val
+    printf '%s' "$__msg" > /dev/tty
+    read -r __val < /dev/tty
+    eval "$__var=\$__val"
+}
 
 #===============================================================================
 # Preflight checks
@@ -127,8 +143,8 @@ if [ -z "$ADMIN_SSH_PUBKEY" ]; then
         if [ -f "$keyfile" ]; then
             DETECTED_KEY=$(head -1 "$keyfile")
             echo ""
-            echo -e "${CYAN}Detected SSH public key: ${NC}${DETECTED_KEY:0:60}..."
-            read -rp "Use this key for VM access? [Y/n] " USE_DETECTED
+            echo -e "${CYAN}Detected SSH public key: ${NC}${DETECTED_KEY:0:60}..." > /dev/tty
+            prompt USE_DETECTED "Use this key for VM access? [Y/n] "
             if [[ ! "$USE_DETECTED" =~ ^[Nn]$ ]]; then
                 ADMIN_SSH_PUBKEY="$DETECTED_KEY"
             fi
@@ -141,11 +157,15 @@ if [ -z "$ADMIN_SSH_PUBKEY" ]; then
     echo ""
     warn "No personal SSH public key set."
     warn "Without it you can only SSH into the VM from this Proxmox host."
-    read -rp "Paste your SSH public key (or press Enter to skip): " ADMIN_SSH_PUBKEY
+    prompt ADMIN_SSH_PUBKEY "Paste your SSH public key (or press Enter to skip): "
 fi
 
+echo ""
+echo -e "  VM MAC:     ${VM_MAC}  (set VM_MAC=xx:xx:xx:xx:xx:xx to change)" > /dev/tty
+echo ""
+
 # Confirm before proceeding
-read -rp "Proceed with deployment? [y/N] " CONFIRM
+prompt CONFIRM "Proceed with deployment? [y/N] "
 [[ "$CONFIRM" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 
 #===============================================================================
@@ -192,7 +212,7 @@ step "3/8 — Create VM"
 # Remove existing VM with same ID if present
 if qm status "$VMID" &>/dev/null; then
     warn "VM $VMID already exists."
-    read -rp "Destroy and recreate it? [y/N] " DESTROY_CONFIRM
+    prompt DESTROY_CONFIRM "Destroy and recreate it? [y/N] "
     if [[ "$DESTROY_CONFIRM" =~ ^[Yy]$ ]]; then
         log "Stopping and destroying VM $VMID..."
         qm stop "$VMID" 2>/dev/null || true
@@ -204,12 +224,12 @@ if qm status "$VMID" &>/dev/null; then
     fi
 fi
 
-log "Creating VM $VMID ($VM_NAME)..."
+log "Creating VM $VMID ($VM_NAME) with MAC ${VM_MAC}..."
 qm create "$VMID" \
     --name "$VM_NAME" \
     --memory "$VM_MEMORY" \
     --cores "$VM_CORES" \
-    --net0 "virtio,bridge=${VM_BRIDGE}" \
+    --net0 "virtio,bridge=${VM_BRIDGE},macaddr=${VM_MAC}" \
     --ostype l26 \
     --onboot 1
 
@@ -268,11 +288,11 @@ sleep 30
 
 VM_IP=""
 while true; do
-    read -rp "Enter VM IP address: " VM_IP
+    prompt VM_IP "Enter VM IP address: "
     if [[ "$VM_IP" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
         break
     else
-        warn "Invalid format. Enter a valid IPv4 address (e.g. 192.168.1.100)"
+        warn "Invalid format. Enter a valid IPv4 address (e.g. 192.168.1.100)" > /dev/tty
     fi
 done
 
