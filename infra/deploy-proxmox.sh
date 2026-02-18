@@ -257,64 +257,26 @@ step "4/8 — Boot VM"
 log "Starting VM $VMID..."
 qm start "$VMID"
 
-log "Waiting for VM to boot and get an IP address (up to 3 minutes)..."
-VM_IP=""
-for i in $(seq 1 36); do
-    sleep 5
-    VM_IP=$(qm guest cmd "$VMID" network-get-interfaces 2>/dev/null | \
-        python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-for iface in data:
-    if iface.get('name') in ('eth0', 'ens18', 'ens3', 'enp0s3', 'ens192'):
-        for addr in iface.get('ip-addresses', []):
-            if addr.get('ip-address-type') == 'ipv4' and not addr['ip-address'].startswith('127.'):
-                print(addr['ip-address'])
-                sys.exit()
-" 2>/dev/null || true)
+echo ""
+log "VM is booting. Check the IP in:"
+log "  • Proxmox web UI → VM $VMID → Summary"
+log "  • Your router's DHCP leases"
+log "  • Or run: qm guest cmd $VMID network-get-interfaces"
+echo ""
+log "Waiting 30 seconds for VM to boot..."
+sleep 30
 
-    if [ -n "$VM_IP" ]; then
-        log "VM IP address: $VM_IP"
+VM_IP=""
+while true; do
+    read -rp "Enter VM IP address: " VM_IP
+    if [[ "$VM_IP" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
         break
+    else
+        warn "Invalid format. Enter a valid IPv4 address (e.g. 192.168.1.100)"
     fi
-    log "  Waiting for IP... ($((i*5))s)"
 done
 
-if [ -z "$VM_IP" ]; then
-    # Try fallback: get any non-loopback IPv4
-    VM_IP=$(qm guest cmd "$VMID" network-get-interfaces 2>/dev/null | \
-        python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-for iface in data:
-    for addr in iface.get('ip-addresses', []):
-        if addr.get('ip-address-type') == 'ipv4' and not addr['ip-address'].startswith('127.'):
-            print(addr['ip-address'])
-            sys.exit()
-" 2>/dev/null || true)
-fi
-
-if [ -z "$VM_IP" ]; then
-    warn "Could not detect VM IP automatically via QEMU guest agent."
-    warn "You can find the IP in the Proxmox web UI under VM $VMID > Summary,"
-    warn "or by checking your router's DHCP leases."
-    echo ""
-    while true; do
-        read -rp "Enter VM IP address manually (or 'q' to quit): " VM_IP
-        if [ "$VM_IP" = "q" ] || [ "$VM_IP" = "Q" ]; then
-            error "Aborted by user. VM $VMID is running — SSH in manually and run deploy-ubuntu.sh + deploy-platform-v2.sh."
-        fi
-        # Basic IP format validation
-        if [[ "$VM_IP" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-            log "Using manually entered IP: $VM_IP"
-            break
-        else
-            warn "Invalid IP format. Please enter a valid IPv4 address (e.g. 192.168.1.100)"
-        fi
-    done
-fi
-
-log "VM is up at $VM_IP"
+log "Using IP: $VM_IP"
 
 # Wait for SSH to be ready
 log "Waiting for SSH to become available..."
