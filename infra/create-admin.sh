@@ -22,7 +22,7 @@ echo "Email: $ADMIN_EMAIL"
 cd "$(dirname "$0")/../apps/api"
 
 # Generate password hash
-PASSWORD_HASH=$(./venv/bin/python3 -c "from veriqko.auth.password import hash_password; print(hash_password('$ADMIN_PASSWORD'))")
+PASSWORD_HASH=$(.venv/bin/python3 -c "from veriqko.auth.password import hash_password; print(hash_password('$ADMIN_PASSWORD'))")
 
 # Insert into database
 sudo -u postgres psql -d veriqko <<EOF
