@@ -97,7 +97,7 @@ log "Branch:  $VERIQKO_BRANCH"
 run_as_veriqko() {
     sudo -u "$VERIQKO_USER" \
         SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-/run/user/$(id -u "$VERIQKO_USER")}/ssh-agent.socket" \
-        GIT_SSH_COMMAND="ssh -i $GITHUB_KEY -o StrictHostKeyChecking=no" \
+        GIT_SSH_COMMAND="ssh -n -i $GITHUB_KEY -o StrictHostKeyChecking=no" \
         "$@"
 }
 
