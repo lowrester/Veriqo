@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
 
-from veriqko.db.session import get_db
+from veriqko.db.base import get_db
 from veriqko.parts.models import Part, PartUsage
 from veriqko.parts.schemas import PartResponse, PartCreate, PartUsageCreate, PartUsageResponse
 from veriqko.jobs.models import Job
