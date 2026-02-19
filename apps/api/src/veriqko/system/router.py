@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Annotated
 
 from veriqko.system.service import system_service, SystemVersion, UpdateStatus
-from veriqko.users.dependencies import get_current_active_user
+from veriqko.dependencies import get_current_active_user
 from veriqko.users.models import User
 from veriqko.enums import UserRole
 

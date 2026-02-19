@@ -7,7 +7,7 @@ from uuid import UUID
 
 from veriqko.db.base import get_db
 from veriqko.settings.models import SystemSetting
-from veriqko.users.dependencies import get_current_active_user
+from veriqko.dependencies import get_current_active_user
 from veriqko.users.models import User, UserRole
 
 router = APIRouter(prefix="/settings", tags=["settings"])
