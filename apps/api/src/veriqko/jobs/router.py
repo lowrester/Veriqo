@@ -11,13 +11,14 @@ from sqlalchemy.orm import selectinload
 from veriqko.db.base import get_db
 from veriqko.dependencies import get_current_user
 from veriqko.jobs.schemas import (
+    JobBatchCreate,
     JobCreate,
     JobHistoryResponse,
     JobListResponse,
     JobResponse,
     JobTransition,
     JobUpdate,
-    JobUpdate,
+)
     TransitionResponse,
     TestStepResponse,
     TestResultCreate,
