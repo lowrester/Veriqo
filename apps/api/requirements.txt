@@ -34,3 +34,6 @@ httpx>=0.26.0
 
 # Cloud Storage
 azure-storage-blob>=12.19.0
+
+# Background Tasks
+apscheduler>=3.10.4
