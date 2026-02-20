@@ -284,6 +284,7 @@ async def main():
     try:
         from veriqko.db.base import async_session_factory
         from veriqko.auth.password import hash_password
+        from veriqko.enums import UserRole
         from sqlalchemy import text
         import uuid, datetime
 
@@ -297,47 +298,52 @@ async def main():
                 return
 
             pw_hash = hash_password("$ADMIN_PASSWORD")
+            # Use 'hashed_password' to match the User model in veriqko/users/models.py
             await session.execute(
                 text("""
-                    INSERT INTO users (id, email, password_hash, full_name, role, is_active, created_at, updated_at)
-                    VALUES (:id, :email, :pw, :name, 'admin', true, :now, :now)
+                    INSERT INTO users (id, email, hashed_password, full_name, role, is_active, created_at, updated_at)
+                    VALUES (:id, :email, :pw, :name, :role, true, :now, :now)
                 """),
                 {
                     "id": str(uuid.uuid4()),
                     "email": "$ADMIN_EMAIL",
                     "pw": pw_hash,
                     "name": "Administrator",
+                    "role": UserRole.ADMIN.value,
                     "now": datetime.datetime.utcnow()
                 }
             )
             await session.commit()
             print("OK: Admin user created")
     except Exception as e:
-        print(f"WARN: {e}", file=sys.stderr)
-        sys.exit(0)  # Non-fatal — admin can be created via create-admin.sh
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
 PYEOF
 )
 
 ADMIN_RESULT=$(run_as_veriqko \
     PYTHONPATH="$API_DIR/src" \
-    "$API_DIR/.venv/bin/python3" -c "$ADMIN_SCRIPT" 2>&1) || true
+    "$API_DIR/.venv/bin/python3" -c "$ADMIN_SCRIPT" 2>&1) || ADMIN_RESULT="FAILED: $?"
 
 if echo "$ADMIN_RESULT" | grep -q "SKIP"; then
     log "Admin user already exists — skipping."
 elif echo "$ADMIN_RESULT" | grep -q "OK"; then
     log "Admin user created: $ADMIN_EMAIL"
 else
-    warn "Admin user creation via Python failed. Trying direct SQL..."
+    warn "Admin user creation via Python failed: $ADMIN_RESULT"
+    warn "Trying direct SQL fallback..."
+    
     PASSWORD_HASH=$(run_as_veriqko \
         PYTHONPATH="$API_DIR/src" \
         "$API_DIR/.venv/bin/python3" -c \
-        "from veriqko.auth.password import hash_password; print(hash_password('$ADMIN_PASSWORD'))" 2>/dev/null) || true
+        "from veriqko.auth.password import hash_password; print(hash_password('$ADMIN_PASSWORD'))" 2>/dev/null) || PASSWORD_HASH=""
 
     if [ -n "$PASSWORD_HASH" ]; then
-        sudo -u postgres psql -d "$DB_NAME" <<EOSQL || warn "SQL admin insert also failed — create admin manually with create-admin.sh"
-INSERT INTO users (id, email, password_hash, full_name, role, is_active, created_at, updated_at)
+        sudo -u postgres psql -d "$DB_NAME" <<EOSQL || warn "SQL admin insert also failed."
+INSERT INTO users (id, email, hashed_password, full_name, role, is_active, created_at, updated_at)
 VALUES (
     gen_random_uuid(),
     '${ADMIN_EMAIL}',
@@ -350,10 +356,17 @@ VALUES (
 )
 ON CONFLICT (email) DO NOTHING;
 EOSQL
-        log "Admin user created via SQL"
+        log "Admin user creation attempted via SQL"
     else
-        warn "Could not hash password. Run: sudo bash infra/create-admin.sh after deployment."
+        warn "Could not hash password for SQL fallback."
     fi
+fi
+
+# Final verification
+if sudo -u postgres psql -d "$DB_NAME" -t -c "SELECT count(*) FROM users WHERE email='${ADMIN_EMAIL}'" | grep -q "1"; then
+    log "✅ Verified: Admin user exists in database."
+else
+    error "Admin user could not be created. Please check $LOGS_DIR/api-error.log"
 fi
 
 #===============================================================================

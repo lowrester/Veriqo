@@ -26,7 +26,7 @@ PASSWORD_HASH=$(.venv/bin/python3 -c "from veriqko.auth.password import hash_pas
 
 # Insert into database
 sudo -u postgres psql -d veriqko <<EOF
-INSERT INTO users (id, email, password_hash, full_name, role, is_active, created_at, updated_at)
+INSERT INTO users (id, email, hashed_password, full_name, role, is_active, created_at, updated_at)
 VALUES (
     gen_random_uuid(),
     '$ADMIN_EMAIL',
