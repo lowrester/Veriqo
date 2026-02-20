@@ -355,7 +355,7 @@ vm_ssh "echo '$ENV_BLOCK' | sudo tee /root/veriqko-env.sh > /dev/null"
 vm_ssh "sudo chmod 600 /root/veriqko-env.sh"
 
 log "Running deploy-ubuntu.sh inside VM..."
-vm_ssh "sudo bash -c 'source /root/veriqko-env.sh && curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqo/main/infra/deploy-ubuntu.sh | bash'" || \
+vm_ssh "sudo bash -c 'source /root/veriqko-env.sh && curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-ubuntu.sh | bash'" || \
     error "deploy-ubuntu.sh failed inside VM. Check VM console for details."
 
 log "OS provisioning complete"
@@ -398,7 +398,7 @@ fi
 step "7/8 — Platform Installation (inside VM)"
 
 log "Running deploy-platform-v2.sh inside VM..."
-vm_ssh "sudo bash -c 'source /root/veriqko-env.sh && curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqo/main/infra/deploy-platform-v2.sh | bash'" || \
+vm_ssh "sudo bash -c 'source /root/veriqko-env.sh && curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-platform-v2.sh | bash'" || \
     error "deploy-platform-v2.sh failed inside VM. Check VM console for details."
 
 log "Platform installation complete"

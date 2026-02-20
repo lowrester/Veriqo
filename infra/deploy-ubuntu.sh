@@ -7,7 +7,7 @@
 # After this completes, run deploy-platform-v2.sh to install the application.
 #
 # Usage (direct):
-#   curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqo/main/infra/deploy-ubuntu.sh | sudo bash
+#   curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-ubuntu.sh | sudo bash
 #
 # Usage (with custom settings):
 #   VERIQKO_DOMAIN=myveriqko.com VERIQKO_DB_PASSWORD=secret sudo -E bash deploy-ubuntu.sh
@@ -57,7 +57,7 @@ fi
 VERIQKO_USER="${VERIQKO_USER:-veriqko}"
 VERIQKO_HOME="/opt/veriqko"
 VERIQKO_DOMAIN="${VERIQKO_DOMAIN:-$(hostname -f)}"
-GITHUB_REPO_SSH="git@github.com:lowrester/Veriqo.git"
+GITHUB_REPO_SSH="git@github.com:lowrester/Veriqko.git"
 
 # Database
 DB_NAME="${DB_NAME:-veriqko}"
@@ -566,7 +566,7 @@ echo ""
 echo "System is ready. Next step:"
 echo ""
 echo -e "  ${BOLD}Run the platform installer:${NC}"
-echo "  curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqo/main/infra/deploy-platform-v2.sh | sudo bash"
+echo "  curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-platform-v2.sh | sudo bash"
 echo ""
 echo "Or if you cloned the repo:"
 echo "  sudo bash /path/to/infra/deploy-platform-v2.sh"

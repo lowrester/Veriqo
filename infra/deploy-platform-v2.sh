@@ -7,7 +7,7 @@
 # PostgreSQL, Python, Node.js, and Nginx.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqo/main/infra/deploy-platform-v2.sh | sudo bash
+#   curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-platform-v2.sh | sudo bash
 #
 # Or with custom settings:
 #   VERIQKO_DOMAIN=myveriqko.com sudo -E bash deploy-platform-v2.sh
@@ -61,7 +61,7 @@ DATA_DIR="$VERIQKO_HOME/data"
 BACKUPS_DIR="$VERIQKO_HOME/backups"
 
 VERIQKO_DOMAIN="${VERIQKO_DOMAIN:-$(hostname -f)}"
-GITHUB_REPO_SSH="git@github.com:lowrester/Veriqo.git"
+GITHUB_REPO_SSH="git@github.com:lowrester/Veriqko.git"
 VERIQKO_BRANCH="${VERIQKO_BRANCH:-main}"
 
 # Database settings

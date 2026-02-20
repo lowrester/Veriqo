@@ -9,7 +9,7 @@ Deploy Veriqko on Ubuntu Server (bare-metal or Proxmox VM).
 Run on a **fresh Ubuntu 22.04/24.04** server (or inside a Proxmox VM):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqo/main/infra/deploy-ubuntu.sh -o /tmp/deploy-ubuntu.sh
+curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-ubuntu.sh -o /tmp/deploy-ubuntu.sh
 sudo bash /tmp/deploy-ubuntu.sh
 ```
 
@@ -34,7 +34,7 @@ sudo bash /tmp/deploy-ubuntu.sh
 Run after Step 1 completes:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqo/main/infra/deploy-platform-v2.sh -o /tmp/deploy-platform.sh
+curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-platform-v2.sh -o /tmp/deploy-platform.sh
 sudo bash /tmp/deploy-platform.sh
 ```
 
@@ -57,7 +57,7 @@ sudo bash /tmp/deploy-platform.sh
 Run `deploy-proxmox.sh` on the **Proxmox host** to create the VM:
 
 ```bash
-wget https://raw.githubusercontent.com/lowrester/Veriqo/main/infra/deploy-proxmox.sh
+wget https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-proxmox.sh
 chmod +x deploy-proxmox.sh
 ./deploy-proxmox.sh
 ```
@@ -107,7 +107,7 @@ Example:
 ```bash
 export VERIQKO_DOMAIN=veriqko.example.com
 export VERIQKO_ADMIN_EMAIL=admin@example.com
-curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqo/main/infra/deploy-ubuntu.sh -o /tmp/deploy-ubuntu.sh
+curl -fsSL https://raw.githubusercontent.com/lowrester/Veriqko/main/infra/deploy-ubuntu.sh -o /tmp/deploy-ubuntu.sh
 sudo -E bash /tmp/deploy-ubuntu.sh
 ```
 
