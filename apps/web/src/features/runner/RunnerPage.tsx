@@ -138,6 +138,7 @@ export function RunnerPage() {
         mutationFn: () => jobsApi.syncPicea(jobId!),
         onSuccess: (data) => {
             addToast(data.message, 'success')
+            queryClient.invalidateQueries({ queryKey: ['job', jobId] })
             queryClient.invalidateQueries({ queryKey: ['job', jobId, 'steps'] })
         },
         onError: () => {

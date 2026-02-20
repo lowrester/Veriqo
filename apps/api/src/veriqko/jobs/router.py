@@ -73,6 +73,12 @@ def _job_to_response(job) -> JobResponse:
         qc_started_at=job.qc_started_at,
         qc_completed_at=job.qc_completed_at,
         completed_at=job.completed_at,
+        # Picea
+        picea_verify_status=job.picea_verify_status,
+        picea_mdm_locked=job.picea_mdm_locked,
+        picea_erase_confirmed=job.picea_erase_confirmed,
+        picea_erase_certificate=job.picea_erase_certificate,
+        picea_diagnostics_raw=job.picea_diagnostics_raw,
         created_at=job.created_at,
         updated_at=job.updated_at,
     )

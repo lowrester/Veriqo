@@ -131,6 +131,13 @@ class JobResponse(BaseModel):
     qc_completed_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
 
+    # Picea Integration
+    picea_verify_status: Optional[str] = None
+    picea_mdm_locked: bool = False
+    picea_erase_confirmed: bool = False
+    picea_erase_certificate: Optional[str] = None
+    picea_diagnostics_raw: Optional[dict] = None
+
     created_at: datetime
     updated_at: datetime
 

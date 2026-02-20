@@ -14,6 +14,7 @@ from sqlalchemy.orm import selectinload
 from veriqko.config import get_settings
 from veriqko.db.base import get_db
 from veriqko.dependencies import get_current_user
+from veriqko.devices.models import Device
 from veriqko.jobs.models import Job, TestResult
 from veriqko.reports.generator import ReportData, TestResultData, get_report_generator
 from veriqko.reports.models import Report, ReportScope, ReportVariant
@@ -68,7 +69,8 @@ async def create_report(
     stmt = (
         select(Job)
         .options(
-            selectinload(Job.device),
+            selectinload(Job.device).selectinload(Device.brand),
+            selectinload(Job.device).selectinload(Device.gadget_type),
             selectinload(Job.assigned_technician),
             selectinload(Job.qc_technician),
             selectinload(Job.test_results).selectinload(TestResult.test_step),
@@ -119,8 +121,8 @@ async def create_report(
     report_data = ReportData(
         job_id=job.id,
         serial_number=job.serial_number,
-        device_brand=job.device.brand if job.device else "Unknown",
-        device_type=job.device.device_type if job.device else "Unknown",
+        device_brand=job.device.brand.name if job.device and job.device.brand else "Unknown",
+        device_type=job.device.gadget_type.name if job.device and job.device.gadget_type else "Unknown",
         device_model=job.device.model if job.device else "Unknown",
         intake_date=job.intake_started_at or job.created_at,
         completion_date=job.completed_at,
@@ -135,6 +137,11 @@ async def create_report(
         variant=variant.value,
         access_token=access_token,
         public_url=public_url,
+        # Picea
+        picea_erase_confirmed=job.picea_erase_confirmed,
+        picea_erase_certificate=job.picea_erase_certificate,
+        picea_verify_status=job.picea_verify_status,
+        picea_mdm_locked=job.picea_mdm_locked,
     )
 
     # Generate PDF
