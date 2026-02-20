@@ -9,15 +9,17 @@ import { PrintLabelModal } from '../printing/components/PrintLabelModal'
 import { PartsSelector, type PartUsage } from './components/PartsSelector'
 import { useFeatureStore } from '@/stores/featureStore'
 import { useState } from 'react'
-// Define types for Job and Step (mock)
 interface Job {
     id: string
     ticket_id: number
     serial_number: string
+    status: string // Added status
     imei?: string
-    brand: string
-    device_type: string
-    device_model: string
+    device?: {
+        brand: string
+        device_type: string
+        model: string
+    }
     sla_due_at?: string // ISO date string
     picea_verify_status?: string
     picea_mdm_locked?: boolean
@@ -160,7 +162,22 @@ export function RunnerPage() {
     }
 
     const completedSteps = steps.filter((s) => s.status === 'pass' || s.status === 'fail').length
+    const mandatorySteps = steps.filter((s) => s.is_mandatory)
+    const allMandatoryDone = mandatorySteps.every((s) => s.status === 'pass' || s.status === 'fail' || s.status === 'skip')
     const progress = steps.length > 0 ? (completedSteps / steps.length) * 100 : 0
+
+    // Determine next transition
+    const getNextStatus = () => {
+        const current = job.status
+        if (current === 'intake') return 'reset'
+        if (current === 'reset') return 'functional'
+        if (current === 'functional') return 'qc'
+        if (current === 'qc') return 'completed'
+        return null
+    }
+
+    const nextStatus = getNextStatus()
+    const canComplete = allMandatoryDone && nextStatus && !transitionMutation.isPending
 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
@@ -195,7 +212,7 @@ export function RunnerPage() {
                     </div>
                     <div className="flex items-center gap-4 mt-1">
                         <h1 className="text-2xl font-bold text-gray-900">
-                            {job.brand} {job.device_model}
+                            {job.device?.brand} {job.device?.model}
                         </h1>
                         {features.sla_management && <SLATimer dueAt={job.sla_due_at} />}
                     </div>
@@ -216,12 +233,13 @@ export function RunnerPage() {
                     {piceaMutation.isPending ? 'Fetching...' : 'Fetch diagnostics'}
                 </button>
                 <button
-                    onClick={() => transitionMutation.mutate('completed')}
-                    disabled={transitionMutation.isPending}
-                    className="btn-primary flex items-center gap-2"
+                    onClick={() => nextStatus && transitionMutation.mutate(nextStatus)}
+                    disabled={!canComplete}
+                    className={`btn-primary flex items-center gap-2 ${!canComplete ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    title={!allMandatoryDone ? "Alla obligatoriska steg måste vara klara" : ""}
                 >
                     <CheckCircle className="w-4 h-4" />
-                    {transitionMutation.isPending ? 'Processing...' : 'Complete Job'}
+                    {transitionMutation.isPending ? 'Processing...' : nextStatus ? `Finish ${job.status}` : 'Completed'}
                 </button>
             </div>
 
@@ -327,9 +345,9 @@ export function RunnerPage() {
                         id: job.id,
                         serial_number: job.serial_number,
                         imei: job.imei,
-                        brand: job.brand,
-                        device_type: job.device_type,
-                        model: job.device_model
+                        brand: job.device?.brand || 'Unknown',
+                        device_type: job.device?.device_type || 'Unknown',
+                        model: job.device?.model || 'Unknown'
                     }}
                 />
             )}

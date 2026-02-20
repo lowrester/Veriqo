@@ -41,11 +41,21 @@ class PiceaClient:
             # Assuming returns a list or direct object
             return data
         except httpx.HTTPStatusError as e:
-            # Log error - we might want to use structlog here later
-            print(f"Picea API Error: {e.response.status_code} - {e.response.text}")
+            import structlog
+            structlog.get_logger(__name__).error(
+                "Picea API Error",
+                status_code=e.response.status_code,
+                text=e.response.text,
+                identifier=identifier
+            )
             return None
         except Exception as e:
-            print(f"Unexpected error calling Picea: {e}")
+            import structlog
+            structlog.get_logger(__name__).error(
+                "Unexpected error calling Picea",
+                error=str(e),
+                identifier=identifier
+            )
             return None
 
     async def close(self):

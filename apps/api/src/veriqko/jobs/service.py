@@ -12,7 +12,7 @@ from sqlalchemy.orm import selectinload
 
 from veriqko.devices.models import Device
 from veriqko.jobs.models import Job, JobHistory, JobStatus
-from veriqko.jobs.schemas import JobCreate, JobUpdate
+from veriqko.jobs.schemas import JobCreate, JobUpdate, JobBatchCreate
 from veriqko.jobs.state_machine import JobStateMachine, TransitionResult
 
 
@@ -49,7 +49,11 @@ class JobRepository:
         """List jobs with optional filtering."""
         stmt = (
             select(Job)
-            .options(selectinload(Job.device), selectinload(Job.assigned_technician))
+            .options(
+                selectinload(Job.device).selectinload(Device.brand),
+                selectinload(Job.device).selectinload(Device.gadget_type),
+                selectinload(Job.assigned_technician)
+            )
             .where(Job.deleted_at.is_(None))
             .order_by(Job.created_at.desc())
             .limit(limit)
@@ -347,19 +351,24 @@ class JobService:
                 from veriqko.integrations.email import email_service
                 # In real app, we would load the customer email from the User object
                 # Try to extract from customer_reference if it looks like an email
-                customer_email = "customer@example.com"
+                # Attempt to get customer email from reference
+                customer_email = None
                 if job.customer_reference and "@" in job.customer_reference:
                     customer_email = job.customer_reference
                 
-                customer_name = "Valued Customer"
-                
-                # Fire and forget (bg task in production)
-                await email_service.send_completion_email(
-                    recipient_email=customer_email,
-                    recipient_name=customer_name,
-                    job_id=job.id,
-                    serial_number=job.serial_number
-                )
+                if customer_email:
+                    customer_name = "Valued Customer"
+                    # Fire and forget (bg task in production)
+                    await email_service.send_completion_email(
+                        recipient_email=customer_email,
+                        recipient_name=customer_name,
+                        job_id=job.id,
+                        serial_number=job.serial_number
+                    )
+                else:
+                    # Log that no email was sent
+                    import logging
+                    logging.getLogger("veriqko").warning(f"No customer email found for job {job.id}, skipping completion email")
 
         return job, result
 

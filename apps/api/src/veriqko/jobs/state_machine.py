@@ -161,8 +161,9 @@ class JobStateMachine:
                 errors.append("Factory reset evidence (photo/video) is required")
             
             job = await self.job_repo.get(job_id)
-            if job and not job.picea_erase_confirmed:
-                errors.append("Data erasure must be confirmed via Picea before proceeding")
+            # User feedback: Don't block if Picea is incompatible/fails
+            # We allow transition even without Picea confirmation
+            pass
 
         # QC -> COMPLETED: Require QC sign-off
         elif current_status == JobStatus.QC and target_status == JobStatus.COMPLETED:

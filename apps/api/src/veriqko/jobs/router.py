@@ -115,10 +115,6 @@ async def list_jobs(
     ]
 
 
-    job = await service.create(data, current_user.id)
-    return _job_to_response(job)
-
-
 @router.post("", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
 async def create_job(
     data: JobCreate,
@@ -300,12 +296,16 @@ async def get_job_steps(
     
     # Ideally this logic belongs in Service, but implementing here for brevity/speed as per constraints
     from veriqko.jobs.models import Job, TestStep, TestResult, JobStatus
-    from sqlalchemy import select
-    from sqlalchemy.orm import selectinload
-    from veriqko.jobs.schemas import TestStepResponse, EvidenceSummary
     
     # Get Job with session.get but we need relationships
-    stmt = select(Job).options(selectinload(Job.device)).where(Job.id == job_id, Job.deleted_at.is_(None))
+    stmt = (
+        select(Job)
+        .options(
+            selectinload(Job.device).selectinload(Device.brand),
+            selectinload(Job.device).selectinload(Device.gadget_type)
+        )
+        .where(Job.id == job_id, Job.deleted_at.is_(None))
+    )
     job = (await db.execute(stmt)).scalar_one_or_none()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")

@@ -136,25 +136,70 @@ export const api = {
   upload: async <T>(
     endpoint: string,
     file: File,
-    _options?: RequestOptions
+    options: RequestOptions = {}
   ): Promise<T> => {
     const formData = new FormData()
     formData.append('file', file)
 
-    const token = useAuthStore.getState().accessToken
-    const headers: Record<string, string> = {}
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`
+    const url = `${API_BASE}${endpoint}`
+    const state = useAuthStore.getState()
+
+    const getHeaders = () => {
+      const h: Record<string, string> = {}
+      if (!options.skipAuth) {
+        const token = state.accessToken
+        if (token) {
+          h['Authorization'] = `Bearer ${token}`
+        }
+      }
+      return h
     }
 
-    const response = await fetch(`${API_BASE}${endpoint}`, {
+    let response = await fetch(url, {
       method: 'POST',
-      headers,
+      headers: getHeaders(),
       body: formData,
     })
 
+    if (!response.ok && response.status === 401 && !options.skipAuth) {
+      const refreshToken = state.refreshToken
+      if (refreshToken) {
+        try {
+          const refreshResponse = await fetch(`${API_BASE}/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+          })
+
+          if (refreshResponse.ok) {
+            const data = await refreshResponse.json()
+            state.setTokens(data.access_token, refreshToken)
+
+            // Retry with new token
+            response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${data.access_token}`
+              },
+              body: formData,
+            })
+          }
+        } catch (e) {
+          console.error("Upload token refresh failed", e)
+        }
+      }
+
+      if (!response.ok && response.status === 401) {
+        state.logout()
+      }
+    }
+
     if (!response.ok) {
-      throw new ApiError(response.status, response.statusText)
+      let errorData
+      try {
+        errorData = await response.json()
+      } catch { }
+      throw new ApiError(response.status, response.statusText, errorData)
     }
 
     return response.json()
