@@ -383,7 +383,7 @@ EOF
 #===============================================================================
 
 log "Creating veriqko system user and directories..."
-id -u "$VERIQKO_USER" &>/dev/null || useradd -r -m -d "$VERIQKO_HOME" -s /bin/bash "$VERIQKO_USER"
+id -u "$VERIQKO_USER" &>/dev/null || useradd -r -m -d "$VERIQKO_HOME" -s /bin/bash "$VERIQKO_USER" || true
 
 mkdir -p "$VERIQKO_HOME"/{app,data,logs,backups,scripts}
 chown -R "$VERIQKO_USER:$VERIQKO_USER" "$VERIQKO_HOME"
