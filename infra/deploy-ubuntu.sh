@@ -174,7 +174,7 @@ echo -e "${YELLOW}Waiting for you to add the key to GitHub...${NC}"
 echo -e "${YELLOW}This script will automatically continue once access is verified.${NC}"
 echo ""
 while true; do
-    SSH_OUT=$(ssh -T git@github.com -i "$GITHUB_KEY_FILE" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no 2>&1)
+    SSH_OUT=$(ssh -T git@github.com -i "$GITHUB_KEY_FILE" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no 2>&1 || true)
     if echo "$SSH_OUT" | grep -iq "successfully authenticated"; then
         log "✅ GitHub SSH authentication successful!"
         break
