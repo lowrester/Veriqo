@@ -130,16 +130,7 @@ log "Domain:  $VERIQKO_DOMAIN"
 log "App dir: $APP_DIR"
 log "Branch:  $VERIQKO_BRANCH"
 
-#===============================================================================
-# Helper: run as veriqko user with SSH agent
-#===============================================================================
 
-run_as_veriqko() {
-    sudo -u "$VERIQKO_USER" \
-        SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-/run/user/$(id -u "$VERIQKO_USER")}/ssh-agent.socket" \
-        GIT_SSH_COMMAND="ssh -i $GITHUB_KEY -o StrictHostKeyChecking=no" \
-        "$@"
-}
 
 #===============================================================================
 # Step 1: Clone Repository
@@ -161,14 +152,9 @@ fi
 log "Cloning $GITHUB_REPO_SSH (branch: $VERIQKO_BRANCH)..."
 
 # Verify SSH connectivity first
-if ! sudo -u "$VERIQKO_USER" \
-    GIT_SSH_COMMAND="ssh -i $GITHUB_KEY -o StrictHostKeyChecking=no" \
-    ssh -T git@github.com < /dev/null 2>&1 | grep -q "successfully authenticated"; then
-    warn "GitHub SSH test inconclusive — attempting clone anyway..."
-    warn "If clone fails, ensure the deploy key is added at: https://github.com/settings/keys"
-fi
+GIT_SSH_COMMAND="ssh -i $GITHUB_KEY -o StrictHostKeyChecking=no" ssh -T git@github.com < /dev/null 2>&1 | grep -q "successfully authenticated" || warn "GitHub SSH test inconclusive."
 
-run_as_veriqko git clone \
+GIT_SSH_COMMAND="ssh -i $GITHUB_KEY -o StrictHostKeyChecking=no" git clone \
     --branch "$VERIQKO_BRANCH" \
     --depth 1 \
     "$GITHUB_REPO_SSH" \
@@ -188,23 +174,23 @@ cd "$API_DIR"
 # Create virtual environment
 if [ ! -d ".venv" ]; then
     log "Creating Python virtual environment..."
-    run_as_veriqko python3.11 -m venv .venv
+    python3.11 -m venv .venv
 else
     log "Virtual environment already exists, reusing."
 fi
 
 log "Upgrading pip..."
-run_as_veriqko .venv/bin/pip install --upgrade pip --quiet
+.venv/bin/pip install --upgrade pip --quiet
 
 log "Installing Python dependencies..."
 if [ -f "requirements.txt" ]; then
-    run_as_veriqko .venv/bin/pip install --no-cache-dir -r requirements.txt || {
+    .venv/bin/pip install --no-cache-dir -r requirements.txt || {
         warn "requirements.txt install failed, trying pyproject.toml..."
-        run_as_veriqko .venv/bin/pip install --no-cache-dir -e ".[dev]" || \
+        .venv/bin/pip install --no-cache-dir -e ".[dev]" || \
             error "Python dependency installation failed."
     }
 elif [ -f "pyproject.toml" ]; then
-    run_as_veriqko .venv/bin/pip install --no-cache-dir -e ".[dev]" || \
+    .venv/bin/pip install --no-cache-dir -e ".[dev]" || \
         error "Python dependency installation failed."
 else
     error "No requirements.txt or pyproject.toml found in $API_DIR"
@@ -273,9 +259,7 @@ step "4/7 — Database Migrations"
 log "Running Alembic migrations..."
 MIGRATION_OK=false
 
-run_as_veriqko \
-    PYTHONPATH="$API_DIR/src" \
-    "$API_DIR/.venv/bin/alembic" upgrade head && MIGRATION_OK=true || true
+PYTHONPATH="$API_DIR/src" "$API_DIR/.venv/bin/alembic" upgrade head && MIGRATION_OK=true || true
 
 if [ "$MIGRATION_OK" = false ]; then
     warn "Migration failed. Attempting to diagnose..."
@@ -286,20 +270,14 @@ if [ "$MIGRATION_OK" = false ]; then
     fi
 
     # Check for dirty state
-    CURRENT_REV=$(run_as_veriqko \
-        PYTHONPATH="$API_DIR/src" \
-        "$API_DIR/.venv/bin/alembic" current 2>&1 | grep -v "^$" | tail -1 || echo "unknown")
+    CURRENT_REV=$(PYTHONPATH="$API_DIR/src" "$API_DIR/.venv/bin/alembic" current 2>&1 | grep -v "^$" | tail -1 || echo "unknown")
     warn "Current alembic revision: $CURRENT_REV"
 
     # Try stamp head and retry (handles out-of-sync state)
     warn "Attempting to stamp head and retry..."
-    run_as_veriqko \
-        PYTHONPATH="$API_DIR/src" \
-        "$API_DIR/.venv/bin/alembic" stamp head 2>/dev/null || true
+    PYTHONPATH="$API_DIR/src" "$API_DIR/.venv/bin/alembic" stamp head 2>/dev/null || true
 
-    run_as_veriqko \
-        PYTHONPATH="$API_DIR/src" \
-        "$API_DIR/.venv/bin/alembic" upgrade head && MIGRATION_OK=true || true
+    PYTHONPATH="$API_DIR/src" "$API_DIR/.venv/bin/alembic" upgrade head && MIGRATION_OK=true || true
 
     if [ "$MIGRATION_OK" = false ]; then
         error "Database migrations failed. Check $LOGS_DIR/migration-error.log and fix manually."
@@ -314,92 +292,12 @@ log "Migrations applied successfully"
 
 step "5/7 — Admin User"
 
-log "Creating admin user (if not exists)..."
+log "Creating admin user via infra/create-admin.sh..."
 
-ADMIN_SCRIPT=$(cat <<PYEOF
-import asyncio, sys
-sys.path.insert(0, '$API_DIR/src')
-
-async def main():
-    try:
-        from veriqko.db.base import async_session_factory
-        from veriqko.auth.password import hash_password
-        from veriqko.enums import UserRole
-        from sqlalchemy import text
-        import uuid, datetime
-
-        async with async_session_factory() as session:
-            result = await session.execute(
-                text("SELECT id FROM users WHERE email = :email"),
-                {"email": "$ADMIN_EMAIL"}
-            )
-            if result.fetchone():
-                print("SKIP: Admin user already exists")
-                return
-
-            pw_hash = hash_password("$ADMIN_PASSWORD")
-            # Use 'hashed_password' to match the User model in veriqko/users/models.py
-            await session.execute(
-                text("""
-                    INSERT INTO users (id, email, hashed_password, full_name, role, is_active, created_at, updated_at)
-                    VALUES (:id, :email, :pw, :name, :role, true, :now, :now)
-                """),
-                {
-                    "id": str(uuid.uuid4()),
-                    "email": "$ADMIN_EMAIL",
-                    "pw": pw_hash,
-                    "name": "Administrator",
-                    "role": UserRole.ADMIN.value,
-                    "now": datetime.datetime.utcnow()
-                }
-            )
-            await session.commit()
-            print("OK: Admin user created")
-    except Exception as e:
-        print(f"ERROR: {e}", file=sys.stderr)
-        sys.exit(1)
-
-if __name__ == "__main__":
-    asyncio.run(main())
-PYEOF
-)
-
-ADMIN_RESULT=$(run_as_veriqko \
-    PYTHONPATH="$API_DIR/src" \
-    "$API_DIR/.venv/bin/python3" -c "$ADMIN_SCRIPT" 2>&1) || ADMIN_RESULT="FAILED: $?"
-
-if echo "$ADMIN_RESULT" | grep -q "SKIP"; then
-    log "Admin user already exists — skipping."
-elif echo "$ADMIN_RESULT" | grep -q "OK"; then
-    log "Admin user created: $ADMIN_EMAIL"
+if [ -f "$APP_DIR/infra/create-admin.sh" ]; then
+    bash "$APP_DIR/infra/create-admin.sh" "$ADMIN_EMAIL" "$ADMIN_PASSWORD"
 else
-    warn "Admin user creation via Python failed: $ADMIN_RESULT"
-    warn "Trying direct SQL fallback..."
-    
-    PASSWORD_HASH=$(run_as_veriqko \
-        PYTHONPATH="$API_DIR/src" \
-        "$API_DIR/.venv/bin/python3" -c \
-        "from veriqko.auth.password import hash_password; print(hash_password('$ADMIN_PASSWORD'))" 2>/dev/null) || PASSWORD_HASH=""
-
-    if [ -n "$PASSWORD_HASH" ]; then
-        sudo -u postgres psql -d "$DB_NAME" <<EOSQL || warn "SQL admin insert also failed."
-INSERT INTO users (id, email, hashed_password, full_name, role, is_active, created_at, updated_at)
-VALUES (
-    gen_random_uuid(),
-    '${ADMIN_EMAIL}',
-    '${PASSWORD_HASH}',
-    'Administrator',
-    'admin',
-    true,
-    NOW(),
-    NOW()
-)
-ON CONFLICT (email) DO NOTHING;
-EOSQL
-        log "Admin user creation attempted via SQL"
-    else
-        warn "Could not hash password for SQL fallback."
-    fi
+    warn "Admin script not found at $APP_DIR/infra/create-admin.sh — skipping admin creation."
 fi
 
 # Final verification
@@ -430,12 +328,12 @@ log "Installing frontend dependencies..."
 FRONTEND_OK=false
 
 # Try npm ci first (clean, reproducible install)
-run_as_veriqko npm ci --prefer-offline 2>/dev/null && FRONTEND_OK=true || true
+npm ci --prefer-offline --unsafe-perm 2>/dev/null && FRONTEND_OK=true || true
 
 if [ "$FRONTEND_OK" = false ]; then
     warn "npm ci failed. Cleaning node_modules and retrying with npm install..."
     rm -rf node_modules package-lock.json
-    run_as_veriqko npm install && FRONTEND_OK=true || true
+    npm install --unsafe-perm && FRONTEND_OK=true || true
 fi
 
 if [ "$FRONTEND_OK" = false ]; then
@@ -443,7 +341,11 @@ if [ "$FRONTEND_OK" = false ]; then
 fi
 
 log "Building frontend..."
-run_as_veriqko npm run build || error "Frontend build failed. Check TypeScript/build errors above."
+npm run build || error "Frontend build failed. Check TypeScript/build errors above."
+
+# Fix permissions for everything now that files are generated
+log "Fixing permissions for veriqko group..."
+chown -R "$VERIQKO_USER:$VERIQKO_USER" "$VERIQKO_HOME"
 
 log "Frontend built successfully"
 

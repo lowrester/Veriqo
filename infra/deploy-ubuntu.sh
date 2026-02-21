@@ -167,10 +167,17 @@ echo -e "${BOLD}${GITHUB_PUBKEY}${NC}"
 echo ""
 divider
 echo ""
-echo -e "${YELLOW}Waiting 60 seconds for you to add the key to GitHub...${NC}"
-echo -e "${YELLOW}Press Enter to continue immediately if already done.${NC}"
+echo -e "${YELLOW}Waiting for you to add the key to GitHub...${NC}"
+echo -e "${YELLOW}This script will automatically continue once access is verified.${NC}"
 echo ""
-read -t 60 -p "Press Enter to continue..." || true
+while true; do
+    if ssh -T git@github.com -i "$GITHUB_KEY_FILE" -o StrictHostKeyChecking=no 2>&1 | grep -q "successfully authenticated"; then
+        log "✅ GitHub SSH authentication successful!"
+        break
+    fi
+    echo -e "  Waiting for GitHub access... (checking again in 10s)"
+    sleep 10
+done
 echo ""
 
 #===============================================================================
