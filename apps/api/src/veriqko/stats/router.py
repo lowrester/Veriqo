@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from datetime import UTC, datetime, timedelta
+from typing import Any
+
+from fastapi import APIRouter, Depends
+from sqlalchemy import and_, case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, case, desc, and_
-from typing import Dict, Any, List
-from datetime import datetime, timedelta, timezone
+from sqlalchemy.orm import selectinload
 
 from veriqko.db.base import get_db
 from veriqko.dependencies import get_current_user
-from sqlalchemy.orm import selectinload
-from veriqko.jobs.models import Job, JobStatus, TestResult, TestResultStatus, TestStep
 from veriqko.devices.models import Device
+from veriqko.jobs.models import Job, JobStatus, TestResult, TestResultStatus, TestStep
 from veriqko.users.models import User
 
 router = APIRouter(prefix="/stats", tags=["stats"])
@@ -17,11 +18,11 @@ router = APIRouter(prefix="/stats", tags=["stats"])
 async def get_dashboard_stats(
     session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get aggregated statistics for the dashboard.
     """
-    
+
     # Base query for counts
     # We'll do a single aggregation query for efficiency
     query = select(
@@ -29,22 +30,22 @@ async def get_dashboard_stats(
         func.sum(case((Job.status == JobStatus.COMPLETED, 1), else_=0)).label("completed"),
         func.sum(case((Job.status == JobStatus.FAILED, 1), else_=0)).label("failed"),
         func.sum(case((Job.status.in_([
-            JobStatus.INTAKE, 
-            JobStatus.RESET, 
-            JobStatus.FUNCTIONAL, 
+            JobStatus.INTAKE,
+            JobStatus.RESET,
+            JobStatus.FUNCTIONAL,
             JobStatus.QC
         ]), 1), else_=0)).label("in_progress")
     ).where(Job.deleted_at.is_(None))
-    
+
     result = await session.execute(query)
     stats = result.one()
-    
+
     # Calculate yield (Pass rate)
     total_closed = (stats.completed or 0) + (stats.failed or 0)
     yield_rate = 0
     if total_closed > 0:
         yield_rate = (stats.completed / total_closed) * 100
-        
+
     # Get recent jobs (limit 5)
     recent_query = (
         select(Job)
@@ -58,7 +59,7 @@ async def get_dashboard_stats(
     )
     recent_result = await session.execute(recent_query)
     recent_jobs = recent_result.scalars().all()
-    
+
     return {
         "counts": {
             "total": stats.total or 0,
@@ -86,16 +87,16 @@ async def get_dashboard_stats(
 def _get_sla_status(due_at: datetime | None) -> str:
     if not due_at:
         return "none"
-        
-    now = datetime.now(timezone.utc)
-    
+
+    now = datetime.now(UTC)
+
     # Ensure due_at is timezone-aware if it's not
     if due_at.tzinfo is None:
-        due_at = due_at.replace(tzinfo=timezone.utc)
-        
+        due_at = due_at.replace(tzinfo=UTC)
+
     diff = due_at - now
     hours = diff.total_seconds() / 3600
-    
+
     if hours < 0:
         return "critical" # Overdue
     if hours < 4:
@@ -103,14 +104,14 @@ def _get_sla_status(due_at: datetime | None) -> str:
     return "healthy"
 
 
-from sqlalchemy.orm import selectinload
 from veriqko.stations.models import Station
+
 
 @router.get("/floor")
 async def get_floor_status(
     session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Get live floor status: stations with their active jobs.
     """
@@ -118,7 +119,7 @@ async def get_floor_status(
     stations_query = select(Station).where(Station.is_active == True).order_by(Station.name)
     stations_result = await session.execute(stations_query)
     stations = stations_result.scalars().all()
-    
+
     # Fetch all active jobs with device details
     # We fetch them effectively properly instead of relying on intricate relationship loading filtering
     jobs_query = select(Job).options(
@@ -132,14 +133,14 @@ async def get_floor_status(
     )
     jobs_result = await session.execute(jobs_query)
     active_jobs = jobs_result.scalars().all()
-    
+
     # Group jobs by station
     jobs_by_station = {}
     for job in active_jobs:
         station_id = str(job.current_station_id) if job.current_station_id else "unassigned"
         if station_id not in jobs_by_station:
             jobs_by_station[station_id] = []
-        
+
         jobs_by_station[station_id].append({
             "id": str(job.id),
             "serial_number": job.serial_number,
@@ -150,10 +151,10 @@ async def get_floor_status(
             "updated_at": job.updated_at,
             "batches": job.batch_id
         })
-        
+
     # Build response structure
     floor_view = []
-    
+
     # 1. Add "Intake/Unassigned" virtual column if there are strictly unassigned jobs (optional, depends on workflow)
     if "unassigned" in jobs_by_station and jobs_by_station["unassigned"]:
         floor_view.append({
@@ -162,7 +163,7 @@ async def get_floor_status(
             "type": "queue",
             "jobs": jobs_by_station["unassigned"]
         })
-        
+
     # 2. Add actual Stations
     for station in stations:
         s_id = str(station.id)
@@ -172,14 +173,14 @@ async def get_floor_status(
             "type": station.station_type,
             "jobs": jobs_by_station.get(s_id, [])
         })
-        
+
     return floor_view
 
 @router.get("/defects")
 async def get_defect_heatmap(
     session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Get defect heatmap aggregated by Device Model and Test Step.
     Returns list of { model, test_step, count }.
@@ -205,10 +206,10 @@ async def get_defect_heatmap(
         .order_by(func.count(TestResult.id).desc())
         .limit(100)
     )
-    
+
     result = await session.execute(query)
     rows = result.all()
-    
+
     return [
         {
             "model": row.model,
@@ -222,12 +223,12 @@ async def get_technician_leaderboard(
     days: int = 7,
     session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Get technician efficiency leaderboard for the last N days.
     """
-    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
-    
+    cutoff = datetime.now(UTC) - timedelta(days=days)
+
     # Query: Jobs completed per assigned technician in period
     query = (
         select(
@@ -247,10 +248,10 @@ async def get_technician_leaderboard(
         .order_by(func.count(Job.id).desc())
         .limit(10)
     )
-    
+
     result = await session.execute(query)
     rows = result.all()
-    
+
     return [
         {
             "name": row.full_name,

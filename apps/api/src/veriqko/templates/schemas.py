@@ -1,28 +1,30 @@
-from typing import Any, Optional
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict
+
 
 class TestStepBase(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     station_type: str
     sequence_order: int
     is_mandatory: bool = True
     requires_evidence: bool = False
-    evidence_instructions: Optional[str] = None
-    criteria: Optional[dict[str, Any]] = None
+    evidence_instructions: str | None = None
+    criteria: dict[str, Any] | None = None
 
 class TestStepCreate(TestStepBase):
     device_id: str
 
 class TestStepUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    station_type: Optional[str] = None
-    sequence_order: Optional[int] = None
-    is_mandatory: Optional[bool] = None
-    requires_evidence: Optional[bool] = None
-    evidence_instructions: Optional[str] = None
-    criteria: Optional[dict[str, Any]] = None
+    name: str | None = None
+    description: str | None = None
+    station_type: str | None = None
+    sequence_order: int | None = None
+    is_mandatory: bool | None = None
+    requires_evidence: bool | None = None
+    evidence_instructions: str | None = None
+    criteria: dict[str, Any] | None = None
 
 class TestStepResponse(TestStepBase):
     id: str

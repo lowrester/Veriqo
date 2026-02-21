@@ -5,9 +5,9 @@ Revises: 007_add_sla_fields
 Create Date: 2026-02-03 20:45:00.000000
 
 """
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '008_add_inventory'

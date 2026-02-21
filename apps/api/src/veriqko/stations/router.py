@@ -1,18 +1,18 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, and_
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-
-from veriqko.db.base import get_db
-from veriqko.dependencies import get_current_user
-from veriqko.stations.models import Station
-from veriqko.jobs.models import Job, JobStatus
-from veriqko.users.models import User, UserRole
 
 # Placeholder schemas (defining inline simple ones if no schemas.py)
 from pydantic import BaseModel, ConfigDict
+from sqlalchemy import and_, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from veriqko.db.base import get_db
+from veriqko.dependencies import get_current_user
+from veriqko.jobs.models import Job, JobStatus
+from veriqko.stations.models import Station
+from veriqko.users.models import User, UserRole
+
 
 class StationBase(BaseModel):
     name: str
@@ -25,7 +25,7 @@ class StationCreate(StationBase):
 
 class StationResponse(StationBase):
     id: str
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 router = APIRouter(prefix="/stations", tags=["stations"])
@@ -49,12 +49,12 @@ async def create_station(
     """Create a new station (Admin only)."""
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Not authorized")
-    
+
     try:
         JobStatus(data.station_type)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid station type")
-        
+
     station = Station(**data.model_dump())
     db.add(station)
     await db.commit()
@@ -71,13 +71,13 @@ async def get_station_queue(
     station = await db.get(Station, station_id)
     if not station:
         raise HTTPException(status_code=404, detail="Station not found")
-        
+
     stmt = select(Job).where(
         and_(
             Job.current_station_id == station_id,
             Job.status.notin_([JobStatus.COMPLETED, JobStatus.FAILED])
         )
     ).order_by(Job.updated_at)
-    
+
     result = await db.execute(stmt)
     return result.scalars().all()

@@ -5,10 +5,11 @@ Revises: 005_add_ticket_id
 Create Date: 2026-02-03 20:00:00.000000
 
 """
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 from sqlalchemy import inspect
+from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '006_add_integration_tables'

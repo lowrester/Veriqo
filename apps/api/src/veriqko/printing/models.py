@@ -10,7 +10,7 @@ from veriqko.db.base import Base, TimestampMixin, UUIDMixin
 
 class LabelTemplate(Base, UUIDMixin, TimestampMixin):
     """Template for ZPL labels."""
-    
+
     __tablename__ = "label_templates"
 
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
@@ -34,7 +34,7 @@ class Printer(Base, UUIDMixin, TimestampMixin):
     port: Mapped[int] = mapped_column(default=9100)
     protocol: Mapped[str] = mapped_column(String(20), default="ZPL")
     is_active: Mapped[bool] = mapped_column(default=True)
-    
+
     # Optional link to station
     station_id: Mapped[str | None] = mapped_column(String(50), nullable=True)
 

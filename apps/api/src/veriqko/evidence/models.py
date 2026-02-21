@@ -3,9 +3,10 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, String, Text, JSON, UUID
+from sqlalchemy import JSON, UUID, BigInteger, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from veriqko.db.base import Base, UUIDMixin
 from veriqko.jobs.models import JobStatus
 

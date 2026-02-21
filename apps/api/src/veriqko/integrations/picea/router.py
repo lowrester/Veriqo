@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_
 
 from veriqko.db.base import get_db
+from veriqko.dependencies import get_current_user
 from veriqko.integrations.picea.service import PiceaService
 from veriqko.users.models import User
-from veriqko.dependencies import get_current_user
 
 router = APIRouter(prefix="/picea", tags=["integrations", "picea"])
 
@@ -20,13 +20,13 @@ async def sync_diagnostics(
     """
     service = PiceaService(db)
     success = await service.sync_job_diagnostics(job_id, current_user.id)
-    
+
     if not success:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to sync diagnostics from Picea. Ensure device identifier is correct and Picea API is reachable."
         )
-    
+
     return {"message": "Diagnostics synchronized successfully."}
 
 
@@ -43,7 +43,7 @@ async def picea_webhook(
     # Picea behavior: payload often has 'serialNumber' or 'imei'
     serial_number = payload.get("serialNumber") or payload.get("serial_number")
     imei = payload.get("imei")
-    
+
     if not serial_number and not imei:
         # We can't identify the job, but we return 200 to acknowledge webhook
         return {"status": "ignored", "reason": "missing_identifier"}
@@ -57,17 +57,17 @@ async def picea_webhook(
         ),
         Job.deleted_at.is_(None)
     ).order_by(Job.created_at.desc())
-    
+
     job = (await db.execute(stmt)).scalar_one_or_none()
-    
+
     if not job:
         return {"status": "ignored", "reason": "job_not_found"}
 
     # 3. Trigger sync
     # We use a system user ID or similar if needed for history
-    # For now, we'll try to sync without a specific user ID if possible, 
+    # For now, we'll try to sync without a specific user ID if possible,
     # or use a placeholder "system_webhook"
     service = PiceaService(db)
     await service.sync_job_diagnostics(job.id, performed_by_id="system_webhook")
-    
+
     return {"status": "processed", "job_id": job.id}

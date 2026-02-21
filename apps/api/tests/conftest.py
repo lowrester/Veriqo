@@ -1,18 +1,19 @@
-import pytest
 import asyncio
-from typing import AsyncGenerator, Generator
-from httpx import AsyncClient, ASGITransport
+from collections.abc import AsyncGenerator, Generator
+
+import pytest
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
-from veriqko.db.base import Base, get_db
-from veriqko.main import app
 from veriqko.config import get_settings
+from veriqko.db.base import get_db
+from veriqko.main import app
 
 settings = get_settings()
 
-# We use a separate test database or the same one? 
+# We use a separate test database or the same one?
 # ideally a test db. For now, let's assume we can mock or use a transaction rollback strategy.
 # Since we are using an actual Postgres, we might want to override the URL.
 # For this "infrastructure" phase, let's setup the engine.
@@ -42,10 +43,10 @@ async def db_session(db_engine) -> AsyncGenerator[AsyncSession, None]:
     async_session = sessionmaker(
         db_engine, class_=AsyncSession, expire_on_commit=False
     )
-    
+
     async with async_session() as session:
         yield session
-        # transaction rollback handled by test isolation usually, 
+        # transaction rollback handled by test isolation usually,
         # but here we rely on dependency override
 
 @pytest.fixture(scope="function")
@@ -53,16 +54,16 @@ async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, 
     """
     Fixture for creating an HTTP client for testing the FastAPI application.
     """
-    
+
     # Override the get_db dependency
     async def override_get_db():
         yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
-    
+
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
-    
+
     app.dependency_overrides.clear()
 
 

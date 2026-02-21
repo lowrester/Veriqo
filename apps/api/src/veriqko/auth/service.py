@@ -3,7 +3,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from veriqko.auth.jwt import create_token_pair, TokenPair
+from veriqko.auth.jwt import TokenPair, create_token_pair
 from veriqko.auth.password import verify_password
 from veriqko.users.models import User
 

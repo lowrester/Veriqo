@@ -1,9 +1,10 @@
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, JSON, UUID
-from sqlalchemy.orm import relationship
-from datetime import datetime
 import uuid
 
+from sqlalchemy import JSON, UUID, Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
 from veriqko.db.base import Base
+
 
 class ApiKey(Base):
     __tablename__ = "api_keys"
@@ -16,7 +17,7 @@ class ApiKey(Base):
     last_used_at = Column(DateTime(timezone=True), nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     created_by_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    
+
     # Relationships
     created_by = relationship("User")
 

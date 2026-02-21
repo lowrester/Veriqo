@@ -1,8 +1,9 @@
 """Job router."""
 
-from datetime import datetime, timezone
-from typing import Annotated, Optional
+from datetime import UTC, datetime
+from typing import Annotated
 
+import fastapi
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,6 +12,7 @@ from sqlalchemy.orm import selectinload
 from veriqko.db.base import get_db
 from veriqko.dependencies import get_current_user
 from veriqko.jobs.schemas import (
+    EvidenceSummary,
     JobBatchCreate,
     JobCreate,
     JobHistoryResponse,
@@ -18,10 +20,9 @@ from veriqko.jobs.schemas import (
     JobResponse,
     JobTransition,
     JobUpdate,
-    TransitionResponse,
-    TestStepResponse,
     TestResultCreate,
-    EvidenceSummary,
+    TestStepResponse,
+    TransitionResponse,
 )
 from veriqko.jobs.service import JobService
 from veriqko.users.models import User
@@ -88,9 +89,9 @@ def _job_to_response(job) -> JobResponse:
 async def list_jobs(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-    status: Optional[str] = Query(None),
-    technician_id: Optional[str] = Query(None),
-    search: Optional[str] = Query(None),
+    status: str | None = Query(None),
+    technician_id: str | None = Query(None),
+    search: str | None = Query(None),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
@@ -302,10 +303,10 @@ async def get_job_steps(
     # 2. Get TestSteps for device_id + station_type
     # 3. Get TestResults for job_id
     # 4. Merge
-    
+
     # Ideally this logic belongs in Service, but implementing here for brevity/speed as per constraints
-    from veriqko.jobs.models import Job, TestStep, TestResult, JobStatus
-    
+    from veriqko.jobs.models import Job, JobStatus, TestResult, TestStep
+
     # Get Job with session.get but we need relationships
     stmt = (
         select(Job)
@@ -318,19 +319,18 @@ async def get_job_steps(
     job = (await db.execute(stmt)).scalar_one_or_none()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
-        
+
     # Determine station type from job status (INTAKE, RESET, FUNCTIONAL, QC)
     # Mapping job status to station type enum
     current_stage = job.status
-    
+
     # If job is completed or failed, we show the steps from the last station (QC)
     # or expose all steps. For now, matching the active stations.
     if current_stage in [JobStatus.COMPLETED, JobStatus.FAILED]:
-        # Show QC steps for completed/failed as it's the final verification point
         display_stage = JobStatus.QC
     else:
         display_stage = current_stage
-        
+
     if display_stage not in [JobStatus.INTAKE, JobStatus.RESET, JobStatus.FUNCTIONAL, JobStatus.QC]:
         return []
 
@@ -340,7 +340,8 @@ async def get_job_steps(
         TestStep.station_type == display_stage
     ).order_by(TestStep.sequence_order)
     steps = (await db.execute(stmt)).scalars().all()
-    
+
+    from sqlalchemy.orm import selectinload
     stmt_results = (
         select(TestResult)
         .options(selectinload(TestResult.evidence_items))
@@ -348,12 +349,12 @@ async def get_job_steps(
     )
     results = (await db.execute(stmt_results)).scalars().all()
     results_map = {r.test_step_id: r for r in results}
-    
+
     # Build response
     response = []
     for step in steps:
         result = results_map.get(step.id)
-        
+
         evidence_list = []
         if result:
             evidence_list = [
@@ -376,7 +377,7 @@ async def get_job_steps(
             notes=result.notes if result else None,
             evidence=evidence_list
         ))
-        
+
     return response
 
 
@@ -389,20 +390,21 @@ async def submit_step_result(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
     """Submit a test result."""
-    from veriqko.jobs.models import TestResult, TestResultStatus
     from datetime import datetime
-    
+
+    from veriqko.jobs.models import TestResult, TestResultStatus
+
     # Check if result exists
     stmt = select(TestResult).where(
         TestResult.job_id == job_id,
         TestResult.test_step_id == step_id
     )
     result = (await db.execute(stmt)).scalar_one_or_none()
-    
+
     if result:
         result.status = TestResultStatus(data.status)
         result.notes = data.notes
-        result.performed_at = datetime.now(timezone.utc)
+        result.performed_at = datetime.now(UTC)
         result.performed_by_id = current_user.id
     else:
         result = TestResult(
@@ -410,10 +412,79 @@ async def submit_step_result(
             test_step_id=step_id,
             status=TestResultStatus(data.status),
             performed_by_id=current_user.id,
-            performed_at=datetime.now(timezone.utc),
+            performed_at=datetime.now(UTC),
             notes=data.notes
         )
         db.add(result)
-        
+
     await db.commit()
     return {"status": "success"}
+
+@router.post("/{job_id}/results/{step_id}/evidence", status_code=status.HTTP_201_CREATED)
+async def upload_step_evidence(
+    job_id: str,
+    step_id: str,
+    file: fastapi.UploadFile = fastapi.File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Upload physical evidence for a test result."""
+    import mimetypes
+    from uuid import uuid4
+
+    from veriqko.evidence.models import Evidence, EvidenceType
+    from veriqko.evidence.storage import get_storage_provider
+    from veriqko.jobs.models import TestResult, TestResultStatus
+
+    # Check if result exists, create if not
+    stmt = select(TestResult).where(
+        TestResult.job_id == job_id,
+        TestResult.test_step_id == step_id
+    )
+    result = (await db.execute(stmt)).scalar_one_or_none()
+
+    if not result:
+        result = TestResult(
+            job_id=job_id,
+            test_step_id=step_id,
+            status=TestResultStatus.PENDING,
+            performed_by_id=current_user.id,
+            performed_at=datetime.now(UTC),
+        )
+        db.add(result)
+        await db.flush() # Need the ID for relationship
+
+    storage = get_storage_provider()
+
+    # Save the file
+    content = await file.read()
+    file_path = await storage.save(content, file.filename)
+
+    # Create DB record
+    mime_type = file.content_type or mimetypes.guess_type(file.filename)[0] or "application/octet-stream"
+    evidence_type = EvidenceType.IMAGE if mime_type.startswith("image/") else EvidenceType.DOCUMENT
+
+    # Find current stage from job
+    from veriqko.jobs.models import Job
+    job = await db.get(Job, job_id)
+
+    evidence = Evidence(
+        id=str(uuid4()),
+        job_id=job_id,
+        test_result_id=result.id,
+        stage=job.status,
+        evidence_type=evidence_type,
+        file_path=file_path,
+        original_filename=file.filename,
+        mime_type=mime_type,
+        size_bytes=len(content),
+        uploaded_by_id=current_user.id
+    )
+    db.add(evidence)
+    await db.commit()
+
+    return {
+        "id": evidence.id,
+        "filename": evidence.original_filename,
+        "url": file_path
+    }

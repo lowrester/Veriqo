@@ -124,7 +124,7 @@ export function RunnerPage() {
     // Upload evidence mutation
     const evidenceMutation = useMutation({
         mutationFn: ({ stepId, file }: { stepId: string, file: File }) => {
-            return api.upload(`/jobs/${jobId}/steps/${stepId}/evidence`, file)
+            return api.upload(`/jobs/${jobId}/results/${stepId}/evidence`, file)
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['job', jobId, 'steps'] })

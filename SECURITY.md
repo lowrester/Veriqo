@@ -1,38 +1,35 @@
-# Security & Compliance Policy
+# Veriqko Security & Compliance Architecture
 
-## Overview
-This document outlines the security practices and compliance posture for the Veriqko platform. We are committed to maintaining high standards of data protection and security, aligning with ISO 27001, GDPR, and SOC 2 Type 2 frameworks.
+This document outlines the security, privacy, and compliance controls implemented in the Veriqko platform to meet ISO 27001, GDPR, and SOC 2 Type II requirements.
 
-## 🔒 Security Practices
+## Data Privacy & GDPR
 
-### 1. Data Protection (GDPR)
-- **Encryption at Rest**: All database volumes and sensitive backups are encrypted using AES-256.
-- **Encryption in Transit**: TLS 1.3 is enforced for all external communications via Nginx.
-- **Data Minimization**: We only collect the minimum amount of personal data required for the service to function.
-- **Access Control**: Role-Based Access Control (RBAC) is implemented throughout the platform.
+### Data Minimization & PII Extrication
+Veriqko processes hardware diagnostic data. We explicitly integrate with Picea Services to systematically wipe and verify the destruction of any Personally Identifiable Information (PII) residing on user devices during the refurbishment flow. 
+- **Erase Confirmation:** The system enforces a strict state-machine guard that prevents devices from progressing beyond the `RESET` phase without an explicit API payload or manual bypass verifying data erasure.
+- **Erase Certificates:** Picea Data Erasure Certificates are retrieved, structurally mapped, and injected definitively into the generated PDF Verification Reports, providing an immutable audit trail of data destruction.
 
-### 2. Infrastructure Security (ISO 27001)
-- **Deployment**: Secure deployment scripts (Proxmox/Ubuntu) automate environment hardening.
-- **SSH Access**: Key-based authentication is required; password-based root SSH is disabled by default.
-- **Updates**: Modular update scripts ensure timely patching of system and application dependencies.
-- **Logging**: Comprehensive auditing of API access and system events.
+### Right to be Forgotten (GDPR Article 17)
+Users and technicians can invoke their Right to be Forgotten via the `DELETE /users/me/forget` API endpoint. This endpoint fully anonymizes user PII (names, emails) with scrambled local replacements and marks the record as inactive while preserving relational integrity for historical SOC 2 audit logs.
 
-### 3. Operational Security (SOC 2)
-- **Availability**: Systemd services with auto-restart ensure high service availability.
-- **Integrity**: Database migrations are version-controlled and tested.
-- **Confidentiality**: JWT-based authentication with high-entropy secrets protects user sessions.
+## Audit Trails & SOC 2 Context
 
-## 🛡️ Reporting a Vulnerability
-If you discover a security vulnerability, please do NOT create a public issue. Instead, report it to the security team:
-- **Email**: security@veriqko.com
-- **PGP Key**: [Add Link/Fingerprint]
+### State Transition Logging
+All job progressions (e.g. `INTAKE` -> `RESET` -> `QC`) are rigidly tracked in the `JobHistory` table. This satisfies SOC 2 requirements for change management and access control tracking:
+- **Timestamping:** Every state transition is recorded using strict timezone-aware (`timezone.utc`) timestamps.
+- **Attribution:** Transitions must be tied to a valid `user_id`.
+- **System Traceability:** The `JobStateMachine` handles validations, guarding against unauthorized transitions in the refurbishment process.
 
-Please include a detailed description of the vulnerability and steps to reproduce.
+### Logical Access Controls
+- Robust JWT-based authentication via OAuth2 tokens.
+- Immediate revocation scenarios handled via short-lived access tokens and refresh mechanisms.
 
-## ⚖️ Compliance Status
-- **ISO 27001**: Guided by best practices in infrastructure management.
-- **GDPR**: Data subject rights and privacy-by-design principles implemented.
-- **SOC 2 Type 2**: Controls in place for Security, Availability, and Confidentiality.
+## ISO 27001 Resilience & Consistency
 
----
-*Last Updated: 2026-02-16*
+### Zero-Downtime Deployment
+The infrastructure pipeline utilizes a Blue/Green deployment strategy (`update.sh`) ensuring continuous availability (Availability control, ISO 27001).
+- Dependency compilation and virtual environment setups transpire in an isolated folder.
+- Only upon complete readiness are the live folders atomically swapped.
+
+### Infrastructure Integrity
+Server deployment configurations utilize deterministic SSH authentication loops, robust system dependency lockdowns (`apt-get` wait loops), and restricted root context isolation. All deployments default to establishing internal communication via constrained configurations and explicit UFW lockdown logic.

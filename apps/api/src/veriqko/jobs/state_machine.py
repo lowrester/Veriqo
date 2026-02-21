@@ -1,8 +1,8 @@
 """Job workflow state machine."""
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Callable, Optional
+from datetime import UTC, datetime
 
 from veriqko.jobs.models import JobStatus
 
@@ -15,7 +15,7 @@ class TransitionContext:
     current_status: JobStatus
     target_status: JobStatus
     user_id: str
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 @dataclass
@@ -24,14 +24,14 @@ class TransitionResult:
 
     success: bool
     from_status: JobStatus
-    to_status: Optional[JobStatus]
+    to_status: JobStatus | None
     timestamp: datetime
     warnings: list[str]
     errors: list[str]
 
 
 # Type aliases
-Guard = Callable[[TransitionContext, "JobRepository"], tuple[bool, Optional[str]]]
+Guard = Callable[[TransitionContext, "JobRepository"], tuple[bool, str | None]]
 
 
 class JobStateMachine:
@@ -95,11 +95,12 @@ class JobStateMachine:
         current_status: JobStatus,
         target_status: JobStatus,
         user_id: str,
-        notes: Optional[str] = None,
+        notes: str | None = None,
         force: bool = False,
+        is_fully_tested: bool = True,
     ) -> TransitionResult:
         """Execute a state transition."""
-        timestamp = datetime.now(timezone.utc)
+        timestamp = datetime.now(UTC)
         errors = []
         warnings = []
 
@@ -118,7 +119,7 @@ class JobStateMachine:
 
         # Run transition-specific guards
         if not force:
-            guard_errors = await self._run_guards(job_id, current_status, target_status, user_id)
+            guard_errors = await self._run_guards(job_id, current_status, target_status, user_id, is_fully_tested)
             if guard_errors:
                 return TransitionResult(
                     success=False,
@@ -144,6 +145,7 @@ class JobStateMachine:
         current_status: JobStatus,
         target_status: JobStatus,
         user_id: str,
+        is_fully_tested: bool = True,
     ) -> list[str]:
         """Run transition-specific validation guards."""
         errors = []
@@ -159,11 +161,10 @@ class JobStateMachine:
             evidence = await self.evidence_repo.get_for_job_stage(job_id, JobStatus.RESET)
             if not evidence:
                 errors.append("Factory reset evidence (photo/video) is required")
-            
+
             job = await self.job_repo.get(job_id)
-            # User feedback: Don't block if Picea is incompatible/fails
-            # We allow transition even without Picea confirmation
-            pass
+            if is_fully_tested and not job.picea_erase_confirmed:
+                errors.append("Picea Data Erasure must be confirmed before proceeding to Functional Test")
 
         # QC -> COMPLETED: Require QC sign-off
         elif current_status == JobStatus.QC and target_status == JobStatus.COMPLETED:

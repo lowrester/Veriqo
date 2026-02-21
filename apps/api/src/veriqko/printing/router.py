@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List, Optional
-from pydantic import BaseModel
 from datetime import datetime
 from uuid import UUID
 
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from veriqko.db.base import get_db
-from veriqko.printing.models import LabelTemplate
 from veriqko.dependencies import get_current_active_user
+from veriqko.printing.models import LabelTemplate
 from veriqko.users.models import User, UserRole
 
 router = APIRouter(prefix="/printing", tags=["printing"])
@@ -16,17 +16,17 @@ router = APIRouter(prefix="/printing", tags=["printing"])
 # --- Schemas ---
 class LabelTemplateCreate(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     zpl_code: str
-    dimensions: Optional[str] = None
+    dimensions: str | None = None
     is_default: bool = False
 
 class LabelTemplateResponse(BaseModel):
     id: UUID
     name: str
-    description: Optional[str]
+    description: str | None
     zpl_code: str
-    dimensions: Optional[str]
+    dimensions: str | None
     is_default: bool
     created_at: datetime
     updated_at: datetime
@@ -36,7 +36,7 @@ class LabelTemplateResponse(BaseModel):
 
 # --- Endpoints ---
 
-@router.get("/templates", response_model=List[LabelTemplateResponse])
+@router.get("/templates", response_model=list[LabelTemplateResponse])
 async def list_templates(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),

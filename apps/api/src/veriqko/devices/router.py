@@ -2,21 +2,27 @@
 from __future__ import annotations
 
 import io
-from typing import Annotated, List
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from veriqko.db.base import get_db
 from veriqko.dependencies import get_current_user
-from veriqko.devices.models import Device, Brand, GadgetType
+from veriqko.devices.models import Brand, Device, GadgetType
 from veriqko.devices.schemas import (
-    BrandCreate, BrandUpdate, BrandResponse,
-    GadgetTypeCreate, GadgetTypeUpdate, GadgetTypeResponse,
-    DeviceCreate, DeviceUpdate, DeviceResponse,
+    BrandCreate,
+    BrandResponse,
+    BrandUpdate,
+    DeviceCreate,
+    DeviceResponse,
+    DeviceUpdate,
+    GadgetTypeCreate,
+    GadgetTypeResponse,
+    GadgetTypeUpdate,
 )
 from veriqko.users.models import User
 
@@ -24,7 +30,7 @@ router = APIRouter(prefix="/admin", tags=["devices"])
 
 # ─────────────────────────── Brands ────────────────────────────
 
-@router.get("/brands", response_model=List[BrandResponse])
+@router.get("/brands", response_model=list[BrandResponse])
 async def list_brands(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)]):
     result = await db.execute(select(Brand).order_by(Brand.name))
     return result.scalars().all()
@@ -58,7 +64,7 @@ async def delete_brand(brand_id: str, db: Annotated[AsyncSession, Depends(get_db
 
 # ─────────────────────────── Gadget Types ──────────────────────
 
-@router.get("/gadget-types", response_model=List[GadgetTypeResponse])
+@router.get("/gadget-types", response_model=list[GadgetTypeResponse])
 async def list_gadget_types(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)]):
     result = await db.execute(select(GadgetType).order_by(GadgetType.name))
     return result.scalars().all()
@@ -95,7 +101,7 @@ async def delete_gadget_type(type_id: str, db: Annotated[AsyncSession, Depends(g
 def _device_query():
     return select(Device).options(joinedload(Device.brand), joinedload(Device.gadget_type))
 
-@router.get("/devices", response_model=List[DeviceResponse])
+@router.get("/devices", response_model=list[DeviceResponse])
 async def list_devices(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[User, Depends(get_current_user)]):
     result = await db.execute(_device_query().order_by(Device.model))
     return result.scalars().all()

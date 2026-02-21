@@ -1,13 +1,13 @@
-from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from datetime import UTC, datetime
 from uuid import uuid4
 
-from veriqko.jobs.models import Job, TestStep, TestResult, TestResultStatus
-from veriqko.integrations.picea.client import PiceaClient
-from veriqko.config import get_settings
 import structlog
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from veriqko.config import get_settings
+from veriqko.integrations.picea.client import PiceaClient
+from veriqko.jobs.models import Job, TestResult, TestResultStatus, TestStep
 
 logger = structlog.get_logger(__name__)
 
@@ -43,10 +43,10 @@ class PiceaService:
         # 3. Update Job-level Picea metadata
         # Structure depends on Picea API - assuming common fields based on analysis
         job.picea_diagnostics_raw = picea_data
-        
+
         # Extract Verify status
         job.picea_verify_status = picea_data.get("verifyStatus") or picea_data.get("verify_status")
-        
+
         # Extract MDM status
         # Picea often returns MDM locked as a boolean or a specific test result
         picea_mdm = picea_data.get("mdmLocked") or picea_data.get("mdm_locked")
@@ -57,7 +57,7 @@ class PiceaService:
         # Look for Erase result in tests or top-level fields
         erase_data = picea_data.get("erase") or {}
         picea_erase = erase_data.get("status") == "passed" or picea_data.get("erase_confirmed", False)
-        
+
         # If not in top-level, search in tests list
         tests = picea_data.get("tests", [])
         if not tests and isinstance(picea_data, list):
@@ -80,7 +80,7 @@ class PiceaService:
             name = picea_test.get("name")
             picea_status = picea_test.get("status", "").lower()
             notes = picea_test.get("notes") or picea_test.get("description")
-            
+
             # Map Picea status to Veriqko status
             status = TestResultStatus.PENDING
             if picea_status in ["pass", "passed", "ok", "success"]:
@@ -98,7 +98,7 @@ class PiceaService:
                 )
             )
             step = step_result.scalar_one_or_none()
-            
+
             if step:
                 await self._upsert_test_result(
                     job_id=job.id,
@@ -123,7 +123,7 @@ class PiceaService:
         job_id: str,
         step_id: str,
         status: TestResultStatus,
-        notes: Optional[str],
+        notes: str | None,
         performed_by_id: str
     ):
         """Helper to update existing result or create new one."""
@@ -136,7 +136,7 @@ class PiceaService:
         )
         test_result = existing_result.scalar_one_or_none()
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if test_result:
             test_result.status = status
             test_result.notes = f"(Picea Sync) {notes}" if notes else "(Picea Sync)"

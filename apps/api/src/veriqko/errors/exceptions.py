@@ -1,6 +1,6 @@
 """Custom exceptions for Veriqko."""
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class VeriqkoError(Exception):
@@ -11,7 +11,7 @@ class VeriqkoError(Exception):
         message: str,
         status_code: int = 500,
         error_code: str = "INTERNAL_ERROR",
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(message)
         self.message = message
@@ -23,7 +23,7 @@ class VeriqkoError(Exception):
 class StorageError(VeriqkoError):
     """Exception raised for storage-related errors."""
 
-    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(
             message=message,
             status_code=500,
@@ -35,7 +35,7 @@ class StorageError(VeriqkoError):
 class ValidationError(VeriqkoError):
     """Exception raised for validation failures."""
 
-    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(
             message=message,
             status_code=400,
@@ -47,7 +47,7 @@ class ValidationError(VeriqkoError):
 class NotFoundError(VeriqkoError):
     """Exception raised when a resource is not found."""
 
-    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(
             message=message,
             status_code=404,

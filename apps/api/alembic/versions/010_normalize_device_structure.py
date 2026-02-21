@@ -5,15 +5,17 @@ Revises: 009_refactor_device_model
 Create Date: 2026-02-05 19:20:00.000000
 """
 
-from typing import Sequence, Union
-import sqlalchemy as sa
-from alembic import op
+from collections.abc import Sequence
 from uuid import uuid4
 
+import sqlalchemy as sa
+
+from alembic import op
+
 revision: str = "010_normalize_device_structure"
-down_revision: Union[str, None] = "009_refactor_device_model"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = "009_refactor_device_model"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     # 1. Create brands table
@@ -46,7 +48,7 @@ def upgrade() -> None:
     # 4. Data Migration
     # Extract unique brands and gadget types, then link them
     connection = op.get_bind()
-    
+
     # Migrate Brands
     brands = connection.execute(sa.text("SELECT DISTINCT brand FROM devices")).fetchall()
     for brand_row in brands:
@@ -79,11 +81,11 @@ def upgrade() -> None:
     # Make columns non-nullable
     op.alter_column('devices', 'brand_id', nullable=False)
     op.alter_column('devices', 'type_id', nullable=False)
-    
+
     # Remove old columns
     op.drop_column('devices', 'brand')
     op.drop_column('devices', 'device_type')
-    
+
     # Add foreign keys
     op.create_foreign_key('fk_devices_brand_id', 'devices', 'brands', ['brand_id'], ['id'])
     op.create_foreign_key('fk_devices_type_id', 'devices', 'gadget_types', ['type_id'], ['id'])
@@ -92,9 +94,9 @@ def downgrade() -> None:
     # Reverse process
     op.add_column('devices', sa.Column('brand', sa.String(length=50), nullable=True))
     op.add_column('devices', sa.Column('device_type', sa.String(length=50), nullable=True))
-    
+
     connection = op.get_bind()
-    
+
     # Restore brand strings
     connection.execute(
         sa.text("UPDATE devices SET brand = (SELECT name FROM brands WHERE brands.id = devices.brand_id)")
@@ -103,15 +105,15 @@ def downgrade() -> None:
     connection.execute(
         sa.text("UPDATE devices SET device_type = (SELECT name FROM gadget_types WHERE gadget_types.id = devices.type_id)")
     )
-    
+
     op.alter_column('devices', 'brand', nullable=False)
     op.alter_column('devices', 'device_type', nullable=False)
-    
+
     op.drop_constraint('fk_devices_brand_id', 'devices', type_='foreignkey')
     op.drop_constraint('fk_devices_type_id', 'devices', type_='foreignkey')
-    
+
     op.drop_column('devices', 'brand_id')
     op.drop_column('devices', 'type_id')
-    
+
     op.drop_table('gadget_types')
     op.drop_table('brands')

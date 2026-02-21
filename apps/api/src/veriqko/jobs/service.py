@@ -2,17 +2,16 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 from uuid import uuid4
 
-from sqlalchemy import select, or_, String
+from sqlalchemy import String, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from veriqko.devices.models import Device
 from veriqko.jobs.models import Job, JobHistory, JobStatus
-from veriqko.jobs.schemas import JobCreate, JobUpdate, JobBatchCreate
+from veriqko.jobs.schemas import JobBatchCreate, JobCreate, JobUpdate
 from veriqko.jobs.state_machine import JobStateMachine, TransitionResult
 
 
@@ -40,16 +39,16 @@ class JobRepository:
 
     async def list(
         self,
-        status: Optional[JobStatus] = None,
-        technician_id: Optional[str] = None,
-        search: Optional[str] = None,
+        status: JobStatus | None = None,
+        technician_id: str | None = None,
+        search: str | None = None,
         limit: int = 50,
         offset: int = 0,
-        current_user: Optional[User] = None,
+        current_user: User | None = None,
     ) -> list[Job]:
         """List jobs with optional filtering."""
         from veriqko.enums import UserRole
-        
+
         stmt = (
             select(Job)
             .options(
@@ -99,7 +98,7 @@ class JobRepository:
 
     async def create(self, data: JobCreate, user_id: str) -> Job:
         """Create a new job."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         ticket_id = await self._get_next_ticket_id()
         from datetime import timedelta
         job = Job(
@@ -136,13 +135,13 @@ class JobRepository:
 
     async def create_batch(self, data: JobBatchCreate, user_id: str) -> list[Job]:
         """Create multiple jobs."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         start_ticket_id = await self._get_next_ticket_id()
         jobs = []
-        
+
         common = data.common_data or {}
         device_id = common.get("device_id")
-        
+
         for i, sn in enumerate(data.serial_numbers):
             job = Job(
                 id=str(uuid4()),
@@ -159,7 +158,7 @@ class JobRepository:
             )
             self.db.add(job)
             jobs.append(job)
-            
+
         await self.db.flush()
 
         # Create history entries
@@ -174,7 +173,7 @@ class JobRepository:
                 notes="Job created (Batch)",
             )
             self.db.add(history)
-            
+
         await self.db.flush()
         return jobs
 
@@ -196,16 +195,16 @@ class JobRepository:
         job_id: str,
         status: JobStatus,
         user_id: str,
-        notes: Optional[str] = None,
+        notes: str | None = None,
         is_fully_tested: bool = True,
-        skip_reason: Optional[str] = None,
+        skip_reason: str | None = None,
     ) -> Job | None:
         """Update job status and record history."""
         job = await self.get(job_id)
         if not job:
             return None
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         old_status = job.status
 
         # Update status
@@ -260,7 +259,7 @@ class JobRepository:
         if not job:
             return False
 
-        job.deleted_at = datetime.now(timezone.utc)
+        job.deleted_at = datetime.now(UTC)
         await self.db.flush()
         return True
 
@@ -299,21 +298,20 @@ class JobService:
 
     async def list(
         self,
-        status: Optional[str] = None,
-        technician_id: Optional[str] = None,
-        search: Optional[str] = None,
+        status: str | None = None,
+        technician_id: str | None = None,
+        search: str | None = None,
         limit: int = 50,
         offset: int = 0,
-        current_user: Optional[User] = None,
+        current_user: User | None = None,
     ) -> list[Job]:
         """List jobs."""
-        from veriqko.enums import UserRole
-        
+
         status_enum = JobStatus(status) if status else None
-        
+
         # Enforce strict customer filtering in the repository or here
         # Actually, let's update JobRepository.list to take current_user
-        
+
         return await self.repo.list(
             status=status_enum,
             technician_id=technician_id,
@@ -340,9 +338,9 @@ class JobService:
         job_id: str,
         target_status: str,
         user_id: str,
-        notes: Optional[str] = None,
+        notes: str | None = None,
         is_fully_tested: bool = True,
-        skip_reason: Optional[str] = None,
+        skip_reason: str | None = None,
     ) -> tuple[Job | None, TransitionResult]:
         """Transition job to a new status."""
         job = await self.repo.get(job_id)
@@ -357,18 +355,19 @@ class JobService:
             target_status=target,
             user_id=user_id,
             notes=notes,
+            is_fully_tested=is_fully_tested,
         )
 
         if result.success:
             job = await self.repo.update_status(
-                job_id, 
-                target, 
-                user_id, 
-                notes, 
-                is_fully_tested=is_fully_tested, 
+                job_id,
+                target,
+                user_id,
+                notes,
+                is_fully_tested=is_fully_tested,
                 skip_reason=skip_reason
             )
-            
+
             # Auto-trigger Picea sync when moving to RESET
             if target == JobStatus.RESET:
                 from veriqko.integrations.picea.service import PiceaService
@@ -381,13 +380,11 @@ class JobService:
             # Send completion email if job is completed
             if target == JobStatus.COMPLETED:
                 from veriqko.integrations.email import email_service
-                # In real app, we would load the customer email from the User object
-                # Try to extract from customer_reference if it looks like an email
-                # Attempt to get customer email from reference
+
                 customer_email = None
                 if job.customer_reference and "@" in job.customer_reference:
                     customer_email = job.customer_reference
-                
+
                 if customer_email:
                     customer_name = "Valued Customer"
                     # Fire and forget (bg task in production)
@@ -400,7 +397,7 @@ class JobService:
                 else:
                     # Log that no email was sent
                     import logging
-                    logging.getLogger("veriqko").warning(f"No customer email found for job {job.id}, skipping completion email")
+                    logging.getLogger("veriqko").info(f"No customer email found in reference for job {job.id}, skipping completion email")
 
         return job, result
 

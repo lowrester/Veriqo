@@ -1,27 +1,26 @@
 """Job schemas."""
 
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class JobCreate(BaseModel):
     """Schema for creating a new job."""
 
-    device_id: Optional[str] = None
+    device_id: str | None = None
     serial_number: str = Field(..., min_length=1, max_length=100)
-    imei: Optional[str] = Field(None, max_length=100)
-    customer_reference: Optional[str] = None
-    batch_id: Optional[str] = None
-    condition_notes: Optional[str] = None
-    intake_condition: Optional[dict] = None
-    brand: Optional[str] = None
-    device_type: Optional[str] = None
-    model: Optional[str] = None
-    model_number: Optional[str] = None
-    colour: Optional[str] = None
-    storage: Optional[str] = None
+    imei: str | None = Field(None, max_length=100)
+    customer_reference: str | None = None
+    batch_id: str | None = None
+    condition_notes: str | None = None
+    intake_condition: dict | None = None
+    brand: str | None = None
+    device_type: str | None = None
+    model: str | None = None
+    model_number: str | None = None
+    colour: str | None = None
+    storage: str | None = None
 
     @field_validator('imei', 'customer_reference', 'batch_id', 'condition_notes',
                      'brand', 'device_type', 'model', 'model_number', 'colour', 'storage',
@@ -36,31 +35,31 @@ class JobCreate(BaseModel):
 class JobBatchCreate(BaseModel):
     """Schema for creating multiple jobs in one go."""
 
-    common_data: Optional[dict] = Field(None, description="Common fields for all jobs (brand, model, etc.)")
+    common_data: dict | None = Field(None, description="Common fields for all jobs (brand, model, etc.)")
     serial_numbers: list[str] = Field(..., min_length=1)
-    batch_id: Optional[str] = None
-    customer_reference: Optional[str] = None
+    batch_id: str | None = None
+    customer_reference: str | None = None
 
 
 class JobUpdate(BaseModel):
     """Schema for updating a job."""
 
-    serial_number: Optional[str] = Field(None, min_length=1, max_length=100)
-    imei: Optional[str] = Field(None, min_length=1, max_length=100)
-    customer_reference: Optional[str] = None
-    batch_id: Optional[str] = None
-    intake_condition: Optional[dict] = None
-    qc_initials: Optional[str] = Field(None, max_length=10)
-    qc_notes: Optional[str] = None
+    serial_number: str | None = Field(None, min_length=1, max_length=100)
+    imei: str | None = Field(None, min_length=1, max_length=100)
+    customer_reference: str | None = None
+    batch_id: str | None = None
+    intake_condition: dict | None = None
+    qc_initials: str | None = Field(None, max_length=10)
+    qc_notes: str | None = None
 
 
 class JobTransition(BaseModel):
     """Schema for job state transition."""
 
     target_status: str
-    notes: Optional[str] = None
+    notes: str | None = None
     is_fully_tested: bool = True
-    reason: Optional[str] = None
+    reason: str | None = None
 
 
 class DeviceSummary(BaseModel):
@@ -107,42 +106,42 @@ class JobResponse(BaseModel):
     """Job response schema."""
 
     id: str
-    ticket_id: Optional[int] = None
+    ticket_id: int | None = None
     serial_number: str
     status: str
-    device: Optional[DeviceSummary] = None
-    assigned_technician: Optional[UserSummary] = None
-    current_station: Optional[StationSummary] = None
+    device: DeviceSummary | None = None
+    assigned_technician: UserSummary | None = None
+    current_station: StationSummary | None = None
 
-    customer_reference: Optional[str] = None
-    batch_id: Optional[str] = None
-    sla_due_at: Optional[datetime] = None
-    intake_condition: Optional[dict] = None
+    customer_reference: str | None = None
+    batch_id: str | None = None
+    sla_due_at: datetime | None = None
+    intake_condition: dict | None = None
 
-    qc_initials: Optional[str] = None
-    qc_notes: Optional[str] = None
+    qc_initials: str | None = None
+    qc_notes: str | None = None
 
     # Timestamps
-    intake_started_at: Optional[datetime] = None
-    intake_completed_at: Optional[datetime] = None
-    reset_started_at: Optional[datetime] = None
-    reset_completed_at: Optional[datetime] = None
-    functional_started_at: Optional[datetime] = None
-    functional_completed_at: Optional[datetime] = None
-    qc_started_at: Optional[datetime] = None
-    qc_completed_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    intake_started_at: datetime | None = None
+    intake_completed_at: datetime | None = None
+    reset_started_at: datetime | None = None
+    reset_completed_at: datetime | None = None
+    functional_started_at: datetime | None = None
+    functional_completed_at: datetime | None = None
+    qc_started_at: datetime | None = None
+    qc_completed_at: datetime | None = None
+    completed_at: datetime | None = None
 
     # Picea Integration
-    picea_verify_status: Optional[str] = None
+    picea_verify_status: str | None = None
     picea_mdm_locked: bool = False
     picea_erase_confirmed: bool = False
-    picea_erase_certificate: Optional[str] = None
-    picea_diagnostics_raw: Optional[dict] = None
+    picea_erase_certificate: str | None = None
+    picea_diagnostics_raw: dict | None = None
 
     # Overrides
     is_fully_tested: bool = True
-    skip_reason: Optional[str] = None
+    skip_reason: str | None = None
 
     created_at: datetime
     updated_at: datetime
@@ -156,11 +155,11 @@ class JobListResponse(BaseModel):
     id: str
     serial_number: str
     status: str
-    device_brand: Optional[str] = None
-    device_type: Optional[str] = None
-    device_model: Optional[str] = None
-    assigned_technician_name: Optional[str] = None
-    customer_reference: Optional[str] = None
+    device_brand: str | None = None
+    device_type: str | None = None
+    device_model: str | None = None
+    assigned_technician_name: str | None = None
+    customer_reference: str | None = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -180,11 +179,11 @@ class JobHistoryResponse(BaseModel):
     """Job history entry response."""
 
     id: str
-    from_status: Optional[str]
+    from_status: str | None
     to_status: str
     changed_by_name: str
     changed_at: datetime
-    notes: Optional[str] = None
+    notes: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -195,7 +194,7 @@ class EvidenceSummary(BaseModel):
     original_filename: str
     evidence_type: str
     created_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -203,20 +202,20 @@ class TestStepResponse(BaseModel):
     """Workflow step with current result status."""
     id: str
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     sequence_order: int
     is_mandatory: bool
     requires_evidence: bool
-    
+
     # Result info
     status: str = "pending"
-    notes: Optional[str] = None
+    notes: str | None = None
     evidence: list[EvidenceSummary] = []
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class TestResultCreate(BaseModel):
     """Schema for submitting a test result."""
     status: str
-    notes: Optional[str] = None
+    notes: str | None = None

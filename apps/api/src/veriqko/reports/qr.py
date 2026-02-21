@@ -2,7 +2,6 @@
 
 import io
 from pathlib import Path
-from typing import Optional
 
 import qrcode
 from PIL import Image
@@ -15,7 +14,7 @@ def generate_qr_code(
     url: str,
     size: int = 200,
     primary_color: str = "#2563eb",
-    logo_path: Optional[Path] = None,
+    logo_path: Path | None = None,
 ) -> io.BytesIO:
     """
     Generate a branded QR code for report access.

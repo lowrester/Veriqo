@@ -5,9 +5,8 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, JSON, UUID
-from sqlalchemy import Identity
 import sqlalchemy as sa
+from sqlalchemy import JSON, UUID, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

@@ -6,14 +6,9 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent / "src"))
 
 from veriqko.db.base import Base, engine
+
 # Import all models to ensure they are registered with Base.metadata
-from veriqko.users.models import User
-from veriqko.jobs.models import Job, TestStep, TestResult, JobHistory
-from veriqko.devices.models import Brand, GadgetType, Device
-from veriqko.stations.models import Station
-from veriqko.evidence.models import Evidence
-from veriqko.parts.models import Part, PartUsage
-from veriqko.printing.models import LabelTemplate
+
 
 async def init_db():
     print("Initializing database...")

@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -13,12 +12,12 @@ class ERPMockService:
         In a real app, this would be an HTTP POST request.
         """
         logger.info(f"[ERP SYNC] Sending usage: SKU={sku}, Qty={quantity}, Job={job_id}")
-        
+
         # Simulate network latency
         await asyncio.sleep(0.5)
-        
+
         # Simulate Success
-        logger.info(f"[ERP SYNC] Success: Usage recorded in ERP.")
+        logger.info("[ERP SYNC] Success: Usage recorded in ERP.")
         return True
 
 erp_service = ERPMockService()

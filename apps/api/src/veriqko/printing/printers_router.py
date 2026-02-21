@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List, Optional
-from pydantic import BaseModel
 from datetime import datetime
 from uuid import UUID
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from veriqko.db.base import get_db
-from veriqko.printing.models import Printer
 from veriqko.dependencies import get_current_active_user
+from veriqko.printing.models import Printer
 from veriqko.users.models import User, UserRole
 
 router = APIRouter(prefix="/printing/printers", tags=["printing"])
@@ -20,7 +20,7 @@ class PrinterBase(BaseModel):
     port: int = 9100
     protocol: str = "ZPL"
     is_active: bool = True
-    station_id: Optional[str] = None
+    station_id: str | None = None
 
 class PrinterCreate(PrinterBase):
     pass
@@ -35,7 +35,7 @@ class PrinterResponse(PrinterBase):
 
 # --- Endpoints ---
 
-@router.get("", response_model=List[PrinterResponse])
+@router.get("", response_model=list[PrinterResponse])
 async def list_printers(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),

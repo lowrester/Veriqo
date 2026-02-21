@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
 from typing import Annotated
 
-from veriqko.system.service import system_service, SystemVersion, UpdateStatus
+from fastapi import APIRouter, Depends, HTTPException
+
 from veriqko.dependencies import get_current_active_user
-from veriqko.users.models import User
 from veriqko.enums import UserRole
+from veriqko.system.service import SystemVersion, UpdateStatus, system_service
+from veriqko.users.models import User
 
 router = APIRouter(prefix="/system", tags=["System"])
 
@@ -15,7 +16,7 @@ async def get_system_version(
     """Get current system version and check for updates."""
     if current_user.role not in [UserRole.ADMIN, UserRole.SUPERVISOR]:
         raise HTTPException(status_code=403, detail="Not authorized")
-        
+
     return await system_service.check_for_updates()
 
 @router.post("/update")
@@ -26,7 +27,7 @@ async def trigger_system_update(
     """Trigger a system update to the specified version."""
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Only admins can update the system")
-        
+
     system_service.trigger_update(target_version)
     return {"message": "Update initiated. Check status for progress."}
 
@@ -37,5 +38,5 @@ async def get_update_status(
     """Get the status of the ongoing update."""
     if current_user.role not in [UserRole.ADMIN, UserRole.SUPERVISOR]:
         raise HTTPException(status_code=403, detail="Not authorized")
-        
+
     return await system_service.get_update_status()

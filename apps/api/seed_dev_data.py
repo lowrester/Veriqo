@@ -2,23 +2,17 @@ import asyncio
 import sys
 from pathlib import Path
 from uuid import uuid4
-from datetime import datetime, timezone
 
 # Add src to path
 sys.path.append(str(Path(__file__).parent / "src"))
 
-from veriqko.db.base import engine, async_session_factory
-from veriqko.users.models import User, UserRole
 from veriqko.auth.password import hash_password
-from veriqko.devices.models import Brand, GadgetType, Device
+from veriqko.db.base import async_session_factory
+from veriqko.devices.models import Brand, Device, GadgetType
+from veriqko.jobs.models import JobStatus
 from veriqko.stations.models import Station
-from veriqko.jobs.models import Job, JobStatus, TestStep, TestResult, JobHistory
-from veriqko.evidence.models import Evidence
-from veriqko.parts.models import Part, PartUsage
-from veriqko.integrations.models import ApiKey, WebhookSubscription
-from veriqko.reports.models import Report
-from veriqko.settings.models import SystemSetting
-from veriqko.printing.models import Printer, LabelTemplate
+from veriqko.users.models import User, UserRole
+
 
 async def seed_data():
     print("Seeding development data...")
@@ -26,7 +20,7 @@ async def seed_data():
         # 1. Create Admin User
         admin_email = "admin@veriqko.com"
         admin_pass = "admin123!"
-        
+
         # Check if exists
         from sqlalchemy import select
         stmt = select(User).where(User.email == admin_email)
@@ -50,7 +44,7 @@ async def seed_data():
             res = await session.execute(stmt)
             if not res.scalar_one_or_none():
                 session.add(Brand(id=str(uuid4()), name=b_name))
-        
+
         # 3. Create Gadget Types
         types = ["Mobile", "Tablet", "Console", "Laptop"]
         for t_name in types:
@@ -83,7 +77,7 @@ async def seed_data():
         mobile_stmt = select(GadgetType).where(GadgetType.name == "Mobile")
         apple = (await session.execute(apple_stmt)).scalar_one()
         mobile = (await session.execute(mobile_stmt)).scalar_one()
-        
+
         stmt = select(Device).where(Device.model == "iPhone 15")
         res = await session.execute(stmt)
         if not res.scalar_one_or_none():

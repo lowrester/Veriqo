@@ -1,16 +1,15 @@
 """Alembic environment configuration."""
 
 import asyncio
+import os
+import sys
 from logging.config import fileConfig
+from pathlib import Path
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
 
-import sys
-import os
-from pathlib import Path
+from alembic import context
 
 # Add src directory to path so we can import veriqko package
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
@@ -19,14 +18,14 @@ from veriqko.config import get_settings
 
 # Import all models to ensure they are registered with Base
 from veriqko.db.base import Base
-from veriqko.users.models import User  # noqa: F401
 from veriqko.devices.models import Device  # noqa: F401
-from veriqko.stations.models import Station  # noqa: F401
-from veriqko.jobs.models import Job, JobHistory, TestResult, TestStep  # noqa: F401
 from veriqko.evidence.models import Evidence  # noqa: F401
-from veriqko.reports.models import Report  # noqa: F401
+from veriqko.jobs.models import Job, JobHistory, TestResult, TestStep  # noqa: F401
 from veriqko.printing.models import LabelTemplate, Printer  # noqa: F401
+from veriqko.reports.models import Report  # noqa: F401
 from veriqko.settings.models import SystemSetting  # noqa: F401
+from veriqko.stations.models import Station  # noqa: F401
+from veriqko.users.models import User  # noqa: F401
 
 config = context.config
 
@@ -40,6 +39,7 @@ config.set_main_option("sqlalchemy.url", settings.database_url)
 
 # Debug: Print masked URL and .env status to help diagnose connection issues
 import re
+
 # Improved masking: keep the protocol and username, hide the password
 masked_url = re.sub(r'(://[^:]+):([^@]+)@', r'\1:***@', settings.database_url)
 print(f"INFO [alembic.env] Connecting to: {masked_url}", file=sys.stderr)
@@ -87,7 +87,7 @@ def do_run_migrations(connection: Connection) -> None:
 async def run_async_migrations() -> None:
     """Run migrations in async mode."""
     from sqlalchemy.ext.asyncio import create_async_engine
-    
+
     # Create engine directly from settings to ensure it matches API config
     connectable = create_async_engine(
         settings.database_url,

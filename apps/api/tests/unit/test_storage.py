@@ -1,10 +1,10 @@
-import pytest
 import os
-from pathlib import Path
 from io import BytesIO
-from unittest.mock import MagicMock, patch
+
+import pytest
 
 from veriqko.evidence.storage import LocalFileStorage, StorageConfig, StoredFile
+
 
 @pytest.fixture
 def storage_config(tmp_path):
@@ -45,7 +45,7 @@ async def test_local_storage_size_limit(local_storage):
     # max_file_size_mb is 1, so 2MB should fail
     content = b"0" * (2 * 1024 * 1024)
     file = BytesIO(content)
-    
+
     with pytest.raises(ValueError, match="File exceeds maximum size"):
         await local_storage.save(file, "job_1", "large.target", "image/jpeg")
 
@@ -54,9 +54,9 @@ async def test_local_storage_delete(local_storage):
     content = b"content"
     file = BytesIO(content)
     stored = await local_storage.save(file, "job_1", "test.jpg", "image/jpeg")
-    
+
     assert os.path.exists(stored.absolute_path)
-    
+
     success = await local_storage.delete(stored.relative_path)
     assert success is True
     assert not os.path.exists(stored.absolute_path)

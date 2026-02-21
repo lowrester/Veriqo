@@ -1,7 +1,6 @@
 """JWT token handling."""
 
-from datetime import datetime, timedelta, timezone
-from typing import Any
+from datetime import UTC, datetime, timedelta
 
 from jose import JWTError, jwt
 from pydantic import BaseModel
@@ -32,7 +31,7 @@ class TokenPair(BaseModel):
 def create_access_token(user_id: str, email: str, role: str) -> str:
     """Create a new access token."""
     settings = get_settings()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     expire = now + timedelta(minutes=settings.jwt_access_token_expire_minutes)
 
     payload = {
@@ -50,7 +49,7 @@ def create_access_token(user_id: str, email: str, role: str) -> str:
 def create_refresh_token(user_id: str, email: str, role: str) -> str:
     """Create a new refresh token."""
     settings = get_settings()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     expire = now + timedelta(days=settings.jwt_refresh_token_expire_days)
 
     payload = {

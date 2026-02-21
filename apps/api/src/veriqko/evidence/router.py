@@ -1,6 +1,6 @@
 """Evidence router."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 from uuid import uuid4
 
@@ -16,7 +16,7 @@ from veriqko.dependencies import get_current_user
 from veriqko.evidence.models import Evidence, EvidenceType
 from veriqko.evidence.schemas import EvidenceListResponse, EvidenceResponse, EvidenceUploadResponse
 from veriqko.evidence.storage import get_storage
-from veriqko.jobs.models import Job, TestResult, TestResultStatus, JobStatus
+from veriqko.jobs.models import Job, TestResult, TestResultStatus
 from veriqko.users.models import User
 
 router = APIRouter(prefix="/jobs/{job_id}/evidence", tags=["evidence"])
@@ -118,7 +118,7 @@ async def upload_evidence(
         )
 
     # Create evidence record
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     evidence = Evidence(
         id=str(uuid4()),
         job_id=job_id,
@@ -180,7 +180,7 @@ async def upload_evidence_for_step(
             test_step_id=step_id,
             status=TestResultStatus.PENDING,
             performed_by_id=current_user.id,
-            performed_at=datetime.now(timezone.utc),
+            performed_at=datetime.now(UTC),
             notes="Auto-created via evidence upload"
         )
         db.add(result)
@@ -199,7 +199,7 @@ async def upload_evidence_for_step(
         raise HTTPException(status_code=400, detail=str(e))
 
     # Create evidence record
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     evidence = Evidence(
         id=str(uuid4()),
         job_id=job_id,
@@ -341,9 +341,9 @@ async def upload_evidence_for_step(
         step = await db.get(TestStep, step_id)
         if not step:
             raise HTTPException(status_code=404, detail="Step not found")
-            
+
         stage = step.station_type
-        
+
         # Create a pending result
         result = TestResult(
             id=str(uuid4()),
@@ -351,7 +351,7 @@ async def upload_evidence_for_step(
             test_step_id=step_id,
             status=TestResultStatus.PENDING,
             performed_by_id=current_user.id,
-            performed_at=datetime.now(timezone.utc),
+            performed_at=datetime.now(UTC),
             notes="Auto-created via evidence upload"
         )
         db.add(result)
@@ -375,7 +375,7 @@ async def upload_evidence_for_step(
         raise HTTPException(status_code=400, detail=str(e))
 
     # Create evidence record
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     evidence = Evidence(
         id=str(uuid4()),
         job_id=job_id,

@@ -2,17 +2,16 @@
 
 import hashlib
 import re
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import BinaryIO, Optional
+from typing import BinaryIO
 from uuid import uuid4
 
 import aiofiles
 import aiofiles.os
 
-
-from abc import ABC, abstractmethod
 
 @dataclass
 class StoredFile:
@@ -112,7 +111,7 @@ class AzureBlobStorage(Storage):
         stored_filename = f"{file_uuid}_{safe_filename}"
 
         # Build blob path: {folder}/YYYY/MM/job_id/
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         blob_path = f"{folder}/{now.year}/{now.month:02d}/{job_id}/{stored_filename}"
 
         # Calculate hash while reading
@@ -128,7 +127,7 @@ class AzureBlobStorage(Storage):
         # Upload to Azure
         container_client = self.client.get_container_client(self.container_name)
         blob_client = container_client.get_blob_client(blob_path)
-        
+
         # Simple upload for now, could be optimized for large files
         blob_client.upload_blob(content, overwrite=True, content_settings={"content_type": mime_type})
 
@@ -210,7 +209,7 @@ class LocalFileStorage(Storage):
         stored_filename = f"{file_uuid}_{safe_filename}"
 
         # Build path: {folder}/YYYY/MM/job_id/
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         relative_dir = Path(folder) / str(now.year) / f"{now.month:02d}" / job_id
         relative_path = relative_dir / stored_filename
         absolute_path = self.base_path / relative_path

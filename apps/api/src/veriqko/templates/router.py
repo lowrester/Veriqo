@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from veriqko.db.base import get_db
 from veriqko.dependencies import get_current_user
-from veriqko.jobs.models import TestStep, JobStatus
+from veriqko.jobs.models import JobStatus, TestStep
 from veriqko.templates.schemas import TestStepCreate, TestStepResponse, TestStepUpdate
 from veriqko.users.models import User
 
@@ -16,17 +16,17 @@ router = APIRouter(prefix="/admin/templates", tags=["templates"])
 async def list_templates(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
-    device_id: Optional[str] = Query(None),
-    station_type: Optional[str] = Query(None),
+    device_id: str | None = Query(None),
+    station_type: str | None = Query(None),
 ):
     """List test step templates, optionally filtered."""
     stmt = select(TestStep).order_by(TestStep.station_type, TestStep.sequence_order)
-    
+
     if device_id:
         stmt = stmt.where(TestStep.device_id == device_id)
     if station_type:
         stmt = stmt.where(TestStep.station_type == station_type)
-        
+
     result = await db.execute(stmt)
     return result.scalars().all()
 
@@ -40,7 +40,7 @@ async def create_template(
     # Convert string station_type to enum if needed, though SQLAlchemy usually handles it if passed as string matching enum value
     # But let's be safe
     try:
-        # Validate station_type 
+        # Validate station_type
         JobStatus(data.station_type)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid station type")
@@ -81,6 +81,6 @@ async def delete_template(
     step = await db.get(TestStep, step_id)
     if not step:
         raise HTTPException(status_code=404, detail="Test step not found")
-    
+
     await db.delete(step)
     await db.commit()

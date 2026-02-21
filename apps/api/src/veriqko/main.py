@@ -2,17 +2,16 @@
 
 from contextlib import asynccontextmanager
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.interval import IntervalTrigger
-
-from veriqko.config import get_settings
-from veriqko.errors.exceptions import VeriqkoError
 
 # Import all models to ensure SQLAlchemy registration
 import veriqko.models  # noqa: F401
+from veriqko.config import get_settings
+from veriqko.errors.exceptions import VeriqkoError
 
 
 @asynccontextmanager
@@ -29,7 +28,7 @@ async def lifespan(app: FastAPI):
     # Initialize Scheduler
     scheduler = AsyncIOScheduler()
     from veriqko.cron.sla_checker import run_sla_checker
-    
+
     # Run SLA check every 15 minutes
     scheduler.add_job(
         run_sla_checker,
@@ -37,7 +36,7 @@ async def lifespan(app: FastAPI):
         id="sla_checker",
         replace_existing=True,
     )
-    
+
     scheduler.start()
     app.state.scheduler = scheduler
 
@@ -83,22 +82,23 @@ def create_app() -> FastAPI:
 
     # Include routers
     from veriqko.auth.router import router as auth_router
-    from veriqko.evidence.router import evidence_router, router as evidence_job_router, step_evidence_router
-    from veriqko.jobs.router import router as jobs_router
-    from veriqko.reports.router import public_router, router as reports_router
-    from veriqko.users.router import router as users_router
     from veriqko.devices.router import router as devices_router
-    from veriqko.templates.router import router as templates_router
-    from veriqko.stations.router import router as stations_router
-    from veriqko.printing.router import router as printing_router
-    from veriqko.printing.printers_router import router as printers_router
-    from veriqko.stats.router import router as stats_router
-    from veriqko.settings.router import router as settings_router
-    from veriqko.integrations.router import router as integrations_router
-    from veriqko.parts.router import router as parts_router
-    from veriqko.system.router import router as system_router
-
+    from veriqko.evidence.router import evidence_router, step_evidence_router
+    from veriqko.evidence.router import router as evidence_job_router
     from veriqko.integrations.picea.router import router as picea_router
+    from veriqko.integrations.router import router as integrations_router
+    from veriqko.jobs.router import router as jobs_router
+    from veriqko.parts.router import router as parts_router
+    from veriqko.printing.printers_router import router as printers_router
+    from veriqko.printing.router import router as printing_router
+    from veriqko.reports.router import public_router
+    from veriqko.reports.router import router as reports_router
+    from veriqko.settings.router import router as settings_router
+    from veriqko.stations.router import router as stations_router
+    from veriqko.stats.router import router as stats_router
+    from veriqko.system.router import router as system_router
+    from veriqko.templates.router import router as templates_router
+    from veriqko.users.router import router as users_router
 
     # API v1 routes
     app.include_router(auth_router, prefix="/api/v1")

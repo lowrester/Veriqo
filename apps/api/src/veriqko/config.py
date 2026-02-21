@@ -2,7 +2,6 @@
 
 from functools import lru_cache
 from pathlib import Path
-from typing import List, Optional
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -48,26 +47,26 @@ class Settings(BaseSettings):
     storage_backend: str = "local"
     storage_base_path: Path = Field(default=Path("/data/veriqko"))
     storage_max_file_size_mb: int = 100
-    azure_storage_connection_string: Optional[str] = None
+    azure_storage_connection_string: str | None = None
     azure_storage_container_name: str = "veriqko-assets"
 
     # Reports
     report_expiry_days: int = 90
 
     # Picea Integration
-    picea_api_url: Optional[str] = None
-    picea_api_key: Optional[str] = None
-    picea_customer_id: Optional[str] = None
+    picea_api_url: str | None = None
+    picea_api_key: str | None = None
+    picea_customer_id: str | None = None
 
     # Branding (white-label)
     brand_name: str = "Veriqko"
-    brand_logo_path: Optional[Path] = None
+    brand_logo_path: Path | None = None
     brand_primary_color: str = "#2563eb"
     brand_secondary_color: str = "#1e40af"
-    brand_footer_text: Optional[str] = None
+    brand_footer_text: str | None = None
 
     # CORS
-    cors_origins: List[str] = Field(default=["http://localhost:3000", "http://localhost:5173"])
+    cors_origins: list[str] = Field(default=["http://localhost:3000", "http://localhost:5173"])
 
     # Logging
     log_level: str = "INFO"

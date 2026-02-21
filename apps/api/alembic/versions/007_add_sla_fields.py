@@ -5,10 +5,10 @@ Revises: 006_add_integration_tables
 Create Date: 2026-02-03 20:30:00.000000
 
 """
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 from sqlalchemy import inspect
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '007_add_sla_fields'

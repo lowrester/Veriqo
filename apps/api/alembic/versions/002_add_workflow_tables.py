@@ -5,10 +5,11 @@ Revises: 001_initial
 Create Date: 2026-02-02 14:00:00.000000
 
 """
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 from sqlalchemy import inspect
+from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '002_add_workflow_tables'
@@ -229,7 +230,7 @@ def downgrade() -> None:
     op.drop_table('jobs')
     op.drop_table('stations')
     op.drop_table('devices')
-    
+
     # Remove column
     op.drop_column('users', 'station_type')
 

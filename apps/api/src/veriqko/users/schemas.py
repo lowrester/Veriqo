@@ -1,9 +1,8 @@
 """User schemas."""
 
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserCreate(BaseModel):
@@ -18,10 +17,10 @@ class UserCreate(BaseModel):
 class UserUpdate(BaseModel):
     """Schema for updating a user."""
 
-    email: Optional[EmailStr] = None
-    full_name: Optional[str] = Field(None, min_length=1, max_length=255)
-    role: Optional[str] = None
-    is_active: Optional[bool] = None
+    email: EmailStr | None = None
+    full_name: str | None = Field(None, min_length=1, max_length=255)
+    role: str | None = None
+    is_active: bool | None = None
 
 
 class UserResponse(BaseModel):

@@ -1,10 +1,10 @@
 """Database base configuration and session management."""
 
+from collections.abc import AsyncGenerator
 from datetime import datetime
-from typing import AsyncGenerator
 from uuid import uuid4
 
-from sqlalchemy import DateTime, func, UUID, JSON
+from sqlalchemy import UUID, DateTime, func
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 

@@ -1,6 +1,6 @@
 """Reports router."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Annotated
 from uuid import uuid4
@@ -161,7 +161,7 @@ async def create_report(
 
     # Generate PDF
     generator = get_report_generator()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     import tempfile
 
@@ -259,7 +259,7 @@ async def get_public_report(
         )
 
     # Check expiration
-    if report.expires_at < datetime.now(timezone.utc):
+    if report.expires_at < datetime.now(UTC):
         raise HTTPException(
             status_code=status.HTTP_410_GONE,
             detail="Report has expired",

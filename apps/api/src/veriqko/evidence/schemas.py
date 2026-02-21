@@ -1,9 +1,8 @@
 """Evidence schemas."""
 
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 
 class EvidenceUploadResponse(BaseModel):
@@ -24,7 +23,7 @@ class EvidenceResponse(BaseModel):
 
     id: str
     job_id: str
-    test_result_id: Optional[str] = None
+    test_result_id: str | None = None
     evidence_type: str
     original_filename: str
     file_size_bytes: int
@@ -32,7 +31,7 @@ class EvidenceResponse(BaseModel):
     sha256_hash: str
     captured_at: datetime
     captured_by_name: str
-    caption: Optional[str] = None
+    caption: str | None = None
     download_url: str
 
     class Config:
@@ -47,7 +46,7 @@ class EvidenceListResponse(BaseModel):
     original_filename: str
     file_size_bytes: int
     captured_at: datetime
-    thumbnail_url: Optional[str] = None
+    thumbnail_url: str | None = None
 
     class Config:
         from_attributes = True

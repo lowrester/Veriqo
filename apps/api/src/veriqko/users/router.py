@@ -1,6 +1,6 @@
 """Users router."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 from uuid import uuid4
 
@@ -159,6 +159,23 @@ async def update_user(
     )
 
 
+@router.delete("/me/forget", status_code=status.HTTP_204_NO_CONTENT)
+async def forget_me(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    """GDPR Right to be Forgotten. Anonymize user PII and soft delete."""
+
+    # Anonymize PII
+    current_user.email = f"anon_{current_user.id}@deleted.local"
+    current_user.full_name = "Anonymized User"
+    current_user.password_hash = "DELETED"
+    current_user.is_active = False
+    current_user.deleted_at = datetime.now(UTC)
+
+    await db.flush()
+
+
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     user_id: str,
@@ -182,5 +199,5 @@ async def delete_user(
             detail="User not found",
         )
 
-    user.deleted_at = datetime.now(timezone.utc)
+    user.deleted_at = datetime.now(UTC)
     await db.flush()

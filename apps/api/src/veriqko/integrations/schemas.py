@@ -1,20 +1,21 @@
-from pydantic import BaseModel
-from typing import List, Optional
 from datetime import datetime
 from uuid import UUID
+
+from pydantic import BaseModel
+
 
 # API Keys
 class ApiKeyCreate(BaseModel):
     name: str
-    scopes: List[str] = ["jobs:read"]
+    scopes: list[str] = ["jobs:read"]
 
 class ApiKeyResponse(BaseModel):
     id: UUID
     name: str
     key_prefix: str
-    scopes: List[str]
+    scopes: list[str]
     created_at: datetime
-    last_used_at: Optional[datetime]
+    last_used_at: datetime | None
     is_active: bool
 
 class ApiKeyCreatedResponse(ApiKeyResponse):
@@ -23,14 +24,14 @@ class ApiKeyCreatedResponse(ApiKeyResponse):
 # Webhooks
 class WebhookCreate(BaseModel):
     url: str
-    description: Optional[str] = None
-    events: List[str]
+    description: str | None = None
+    events: list[str]
 
 class WebhookResponse(BaseModel):
     id: UUID
     url: str
-    description: Optional[str]
-    events: List[str]
+    description: str | None
+    events: list[str]
     is_active: bool
     failure_count: int
     secret_key: str  # Returned so user can verify signatures

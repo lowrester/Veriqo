@@ -1,5 +1,5 @@
-import logging
 import asyncio
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -11,10 +11,10 @@ class EmailMockService:
         Simulate sending a completion email to the customer.
         """
         logger.info(f"[EMAIL MOCK] Sending completion email to {recipient_name} <{recipient_email}> for Job #{job_id} ({serial_number})")
-        
+
         # Simulate network latency
         await asyncio.sleep(0.3)
-        
+
         # Simulate email content logging
         email_content = f"""
         Subject: Your Device {serial_number} is Ready!
@@ -29,7 +29,7 @@ class EmailMockService:
         Thank you for choosing Veriqko.
         """
         logger.info(f"[EMAIL MOCK] Content:\n{email_content}")
-        
+
         return True
 
 email_service = EmailMockService()

@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-from enum import Enum
-
-from sqlalchemy import Boolean, String, Integer
+from sqlalchemy import Boolean, Integer, String
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from veriqko.jobs.models import JobStatus
-
 from veriqko.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
 from veriqko.enums import UserRole
+from veriqko.jobs.models import JobStatus
 
 
 class User(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):

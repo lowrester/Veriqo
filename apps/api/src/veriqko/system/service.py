@@ -2,9 +2,9 @@ import asyncio
 import os
 import subprocess
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
+
 
 class SystemVersion(BaseModel):
     current_version: str
@@ -17,11 +17,11 @@ class UpdateStatus(BaseModel):
     current_step: str
     progress_percent: int
     last_log: str
-    error: Optional[str] = None
+    error: str | None = None
 
 class SystemService:
     """Service for managing system updates and version checking."""
-    
+
     UPDATE_SCRIPT_PATH = "scripts/system_update.sh"
     STATUS_FILE = "/opt/veriqko/update_status.json"
 
@@ -37,7 +37,7 @@ class SystemService:
             stdout, _ = await process.communicate()
             if process.returncode == 0:
                 return stdout.decode().strip()
-            
+
             # Fallback to short hash
             process = await asyncio.create_subprocess_shell(
                 "git rev-parse --short HEAD",
@@ -53,9 +53,9 @@ class SystemService:
         """Fetch remote tags and compare with current."""
         # Fetch latest
         await asyncio.create_subprocess_shell("git fetch --tags")
-        
+
         current = await self.get_current_version()
-        
+
         # Get latest remote tag
         process = await asyncio.create_subprocess_shell(
             "git describe --tags $(git rev-list --tags --max-count=1)",
@@ -79,7 +79,7 @@ class SystemService:
         """
         # Ensure script is executable
         os.chmod(self.UPDATE_SCRIPT_PATH, 0o755)
-        
+
         # Run detached
         subprocess.Popen(
             ["nohup", self.UPDATE_SCRIPT_PATH, target_version, "&"],
@@ -95,7 +95,7 @@ class SystemService:
         if os.path.exists(self.STATUS_FILE):
              # Read file logic here (omitted for MVP start)
              pass
-             
+
         return UpdateStatus(
             is_updating=False,
             current_step="Idle",

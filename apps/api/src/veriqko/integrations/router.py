@@ -1,15 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List
+
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from veriqko.db.base import get_db
 from veriqko.dependencies import get_current_user
-from veriqko.users.models import User
-from veriqko.integrations.service import IntegrationService
 from veriqko.integrations.schemas import (
-    ApiKeyCreate, ApiKeyResponse, ApiKeyCreatedResponse,
-    WebhookCreate, WebhookResponse
+    ApiKeyCreate,
+    ApiKeyCreatedResponse,
+    ApiKeyResponse,
+    WebhookCreate,
+    WebhookResponse,
 )
+from veriqko.integrations.service import IntegrationService
+from veriqko.users.models import User
 
 router = APIRouter(prefix="/integrations", tags=["integrations"])
 
@@ -21,7 +24,7 @@ async def create_api_key(
 ):
     service = IntegrationService(session)
     api_key, raw_key = await service.create_api_key(data.name, data.scopes, current_user.id)
-    
+
     # Convert to Pydantic
     response = ApiKeyCreatedResponse(
         id=api_key.id,
@@ -35,7 +38,7 @@ async def create_api_key(
     )
     return response
 
-@router.get("/api-keys", response_model=List[ApiKeyResponse])
+@router.get("/api-keys", response_model=list[ApiKeyResponse])
 async def list_api_keys(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db)
@@ -54,7 +57,7 @@ async def create_webhook(
     webhook = await service.create_webhook(data.url, data.events, current_user.id)
     return webhook
 
-@router.get("/webhooks", response_model=List[WebhookResponse])
+@router.get("/webhooks", response_model=list[WebhookResponse])
 async def list_webhooks(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db)

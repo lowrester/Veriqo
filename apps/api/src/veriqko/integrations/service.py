@@ -1,11 +1,12 @@
-import secrets
 import hashlib
-from typing import List, Optional
+import secrets
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from veriqko.integrations.models import ApiKey, WebhookSubscription
+
 
 class KeyGenerator:
     @staticmethod
@@ -28,10 +29,10 @@ class IntegrationService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_api_key(self, name: str, scopes: List[str], user_id: UUID) -> tuple[ApiKey, str]:
+    async def create_api_key(self, name: str, scopes: list[str], user_id: UUID) -> tuple[ApiKey, str]:
         """Creates a new API Key. Returns model and raw key (to show once)."""
         raw_key, hashed_key = KeyGenerator.generate()
-        
+
         api_key = ApiKey(
             name=name,
             key_prefix=raw_key[:8],
@@ -44,7 +45,7 @@ class IntegrationService:
         await self.session.refresh(api_key)
         return api_key, raw_key
 
-    async def get_api_key_by_hash(self, hashed_key: str) -> Optional[ApiKey]:
+    async def get_api_key_by_hash(self, hashed_key: str) -> ApiKey | None:
         """Retrieves an active API Key by its hash."""
         result = await self.session.execute(
             select(ApiKey).where(
@@ -54,11 +55,11 @@ class IntegrationService:
         )
         return result.scalars().first()
 
-    async def list_api_keys(self) -> List[ApiKey]:
+    async def list_api_keys(self) -> list[ApiKey]:
         result = await self.session.execute(select(ApiKey).order_by(ApiKey.created_at.desc()))
         return result.scalars().all()
 
-    async def create_webhook(self, url: str, events: List[str], user_id: UUID) -> WebhookSubscription:
+    async def create_webhook(self, url: str, events: list[str], user_id: UUID) -> WebhookSubscription:
         webhook = WebhookSubscription(
             url=url,
             events=events,
@@ -70,6 +71,6 @@ class IntegrationService:
         await self.session.refresh(webhook)
         return webhook
 
-    async def list_webhooks(self) -> List[WebhookSubscription]:
+    async def list_webhooks(self) -> list[WebhookSubscription]:
         result = await self.session.execute(select(WebhookSubscription))
         return result.scalars().all()

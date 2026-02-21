@@ -5,7 +5,6 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
@@ -14,6 +13,8 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import (
     Image as RLImage,
+)
+from reportlab.platypus import (
     Paragraph,
     SimpleDocTemplate,
     Spacer,
@@ -30,7 +31,7 @@ class TestResultData:
 
     name: str
     status: str
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 @dataclass
@@ -45,10 +46,10 @@ class ReportData:
 
     # Workflow data
     intake_date: datetime
-    completion_date: Optional[datetime]
+    completion_date: datetime | None
     technician_name: str
-    qc_technician_name: Optional[str]
-    qc_initials: Optional[str]
+    qc_technician_name: str | None
+    qc_initials: str | None
 
     # Test results
     test_results: list[TestResultData]
@@ -66,8 +67,8 @@ class ReportData:
 
     # Picea Integration
     picea_erase_confirmed: bool = False
-    picea_erase_certificate: Optional[str] = None
-    picea_verify_status: Optional[str] = None
+    picea_erase_certificate: str | None = None
+    picea_verify_status: str | None = None
     picea_mdm_locked: bool = False
 
 
@@ -76,10 +77,10 @@ class BrandingConfig:
     """Branding configuration for reports."""
 
     brand_name: str
-    logo_path: Optional[Path]
+    logo_path: Path | None
     primary_color: str
     secondary_color: str
-    footer_text: Optional[str]
+    footer_text: str | None
 
 
 class PDFReportGenerator:
@@ -247,10 +248,10 @@ class PDFReportGenerator:
                  security_data.append(["Data Erasure:", "CONFIRMED (ADISA/NIST)"])
                  if data.picea_erase_certificate:
                      security_data.append(["Certificate:", data.picea_erase_certificate])
-             
+
              if data.picea_verify_status:
                  security_data.append(["Picea Verify:", data.picea_verify_status])
-             
+
              if security_data:
                  table = Table(security_data, colWidths=[2 * inch, 4 * inch])
                  table.setStyle(
