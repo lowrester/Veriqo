@@ -78,6 +78,7 @@ secure_prompt() {
     local secret="$4"
     
     if [ -z "${!var_name:-}" ]; then
+        local val=""
         if [ "$secret" = "true" ]; then
             printf "${CYAN}[PROMPT]${NC} %s (will be hidden): " "$prompt"
             read -rs val < /dev/tty 2>/dev/null || true
